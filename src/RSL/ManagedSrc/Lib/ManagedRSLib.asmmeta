@@ -1,0 +1,1082 @@
+.assembly extern 'System'
+{
+  .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+  .ver clr2.0
+}
+.assembly extern 'mscorlib'
+{
+  .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+  .ver clr2.0
+}
+.assembly 'ManagedRSLib'
+{
+  .custom instance void ['mscorlib']'System.Reflection'.'AssemblyDelaySignAttribute'::.ctor(bool) = (01 00 01 00 00)
+  .custom instance void ['mscorlib']'System.Runtime.InteropServices'.'ComVisibleAttribute'::.ctor(bool) = (01 00 00 00 00)
+  .permissionset reqmin = (2E 01 80 84 53 79 73 74 65 6D 2E 53 65 63 75 72 69 74 79 2E 50 65 72 6D 69 73 73 69 6F 6E 73 2E 53 65 63 75 72 69 74 79 50 65 72 6D 69 73 73 69 6F 6E 41 74 74 72 69 62 75 74 65 2C 20 6D 73 63 6F 72 6C 69 62 2C 20 56 65 72 73 69 6F 6E 3D 32 2E 30 2E 30 2E 30 2C 20 43 75 6C 74 75 72 65 3D 6E 65 75 74 72 61 6C 2C 20 50 75 62 6C 69 63 4B 65 79 54 6F 6B 65 6E 3D 62 37 37 61 35 63 35 36 31 39 33 34 65 30 38 39 15 01 54 02 10 53 6B 69 70 56 65 72 69 66 69 63 61 74 69 6F 6E 01)
+  .publickey = (00 24 00 00 04 80 00 00 94 00 00 00 06 02 00 00 00 24 00 00 52 53 41 31 00 04 00 00 01 00 01 00 B5 FC 90 E7 02 7F 67 87 1E 77 3A 8F DE 89 38 C8 1D D4 02 BA 65 B9 20 1D 60 59 3E 96 C4 92 65 1E 88 9C C1 3F 14 15 EB B5 3F AC 11 31 AE 0B D3 33 C5 EE 60 21 67 2D 97 18 EA 31 A8 AE BD 0D A0 07 2F 25 D8 7D BA 6F C9 0F FD 59 8E D4 DA 35 E4 4C 39 8C 45 43 07 E8 E3 3B 84 26 14 3D AE C9 F5 96 83 6F 97 C8 F7 47 50 E5 97 5C 64 E2 18 9F 45 DE F4 6B 2A 2B 12 47 AD C3 65 2B F5 C3 08 05 5D A9)
+  .hash algorithm 0x00008004
+  .ver windows
+}
+.namespace 'ManagedRSLib'
+{
+  .class public interface abstract 'IManagedRSLCheckpointCreator'
+  {
+    .method public virtual hidebysig newslot abstract 
+      instance void 'SaveState'(class 'ManagedRSLib'.'ManagedRSLCheckpointStream' 'gc_writer')
+    {
+    }
+  }
+  .class public 'ManagedRSLCheckpointStream'
+    extends ['mscorlib']'System.IO'.'Stream'
+  {
+    .method public virtual hidebysig 
+      instance int32 'Read'(unsigned int8[] 'buffer', int32 'offset', int32 'count')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance int32 'ReadByte'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance int64 'get_Position'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance void 'set_Position'(int64 'value')
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance int64 'get_Length'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_CanRead'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_CanSeek'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_CanWrite'()
+    {
+      ret
+    }
+    .method public virtual hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_CanTimeout'()
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance int64 'Seek'(int64 'offset', valuetype ['mscorlib']'System.IO'.'SeekOrigin' 'origin')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'SetLength'(int64 'value')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'Write'(unsigned int8[] 'buffer', int32 'offset', int32 'count')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'WriteByte'(unsigned int8 'value')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'Flush'()
+    {
+      ret
+    }
+    .property instance bool 'CanRead'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_CanRead'()
+    }
+    .property instance bool 'CanSeek'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_CanSeek'()
+    }
+    .property instance bool 'CanTimeout'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_CanTimeout'()
+    }
+    .property instance bool 'CanWrite'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_CanWrite'()
+    }
+    .property instance int64 'Length'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_Length'()
+    }
+    .property instance int64 'Position'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'get_Position'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLCheckpointStream'::'set_Position'(int64)
+    }
+  }
+  .class public sealed 'ManagedRSLCheckpointUtility'
+    extends ['mscorlib']'System'.'Object'
+  {
+    .method public static hidebysig 
+      void 'SaveCheckpoint'(string 'directoryName', valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'version', unsigned int64 'lastExecutedSequenceNumber', unsigned int32 'configurationNumber', class 'ManagedRSLib'.'ManagedRSLMemberSet' 'gc_memberSet', class 'ManagedRSLib'.'IManagedRSLCheckpointCreator' 'gc_checkpointCreator')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      bool marshal(unsigned int8) 'ChangeReplicaSet'(string 'checkpointName', class 'ManagedRSLib'.'ManagedRSLMemberSet' 'memberSet')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      bool marshal(unsigned int8) 'MigrateToVersion3'(string 'checkpointName', class 'ManagedRSLib'.'ManagedRSLMemberSet' 'memberSet')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      bool marshal(unsigned int8) 'MigrateToVersion4'(string 'checkpointName', class 'ManagedRSLib'.'ManagedRSLMemberSet' 'memberSet')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      bool marshal(unsigned int8) 'GetReplicaSet'(string 'checkpointName', class 'ManagedRSLib'.'ManagedRSLMemberSet' 'memberSet')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      string 'GetLatestCheckpoint'(string 'rslDirectory')
+    {
+      ret
+    }
+  }
+  .class public 'ManagedRSLConfigParam'
+    extends ['mscorlib']'System'.'Object'
+    implements ['mscorlib']'System'.'IDisposable'
+  {
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_NewLeaderGracePeriodSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_NewLeaderGracePeriodSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_HeartBeatIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_HeartBeatIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_ElectionDelaySec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_ElectionDelaySec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_MaxElectionRandomizeSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxElectionRandomizeSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_InitializeRetryIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_InitializeRetryIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_PrepareRetryIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_PrepareRetryIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_VoteRetryIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_VoteRetryIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_CPQueryRetryIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_CPQueryRetryIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_MaxCheckpointIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxCheckpointIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_JoinMessagesIntervalSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_JoinMessagesIntervalSec'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int64 'get_MaxLogLenMB'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxLogLenMB'(int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_SendTimeoutSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_SendTimeoutSec'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_ReceiveTimeoutSec'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_ReceiveTimeoutSec'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxCacheLengthMB'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxCacheLengthMB'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxVotesInLog'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxVotesInLog'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxOutstandingPerReplica'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxOutstandingPerReplica'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxCheckpoints'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxCheckpoints'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxLogs'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxLogs'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_LogLenRandomize'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_LogLenRandomize'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_ElectionRandomize'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_ElectionRandomize'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_FastReadSeqThreshold'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_FastReadSeqThreshold'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_InMemoryExecutionQueueSizeMB'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_InMemoryExecutionQueueSizeMB'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_NumReaderThreads'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_NumReaderThreads'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int32 'get_MaxMessageSizeMB'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MaxMessageSizeMB'(unsigned int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance string 'get_WorkingDir'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_WorkingDir'(string 'value')
+    {
+      ret
+    }
+    .method family virtual hidebysig newslot 
+      instance void 'Dispose'(bool marshal(unsigned int8) 'A_0')
+    {
+      ret
+    }
+    .method public final virtual hidebysig 
+      instance void 'Dispose'()
+    {
+      ret
+    }
+    .method family virtual hidebysig 
+      instance void 'Finalize'()
+    {
+      ret
+    }
+    .property instance int64 'CPQueryRetryIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_CPQueryRetryIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_CPQueryRetryIntervalSec'(int64)
+    }
+    .property instance int64 'ElectionDelaySec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_ElectionDelaySec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_ElectionDelaySec'(int64)
+    }
+    .property instance unsigned int32 'ElectionRandomize'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_ElectionRandomize'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_ElectionRandomize'(unsigned int32)
+    }
+    .property instance unsigned int32 'FastReadSeqThreshold'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_FastReadSeqThreshold'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_FastReadSeqThreshold'(unsigned int32)
+    }
+    .property instance int64 'HeartBeatIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_HeartBeatIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_HeartBeatIntervalSec'(int64)
+    }
+    .property instance unsigned int32 'InMemoryExecutionQueueSizeMB'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_InMemoryExecutionQueueSizeMB'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_InMemoryExecutionQueueSizeMB'(unsigned int32)
+    }
+    .property instance int64 'InitializeRetryIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_InitializeRetryIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_InitializeRetryIntervalSec'(int64)
+    }
+    .property instance int64 'JoinMessagesIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_JoinMessagesIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_JoinMessagesIntervalSec'(int64)
+    }
+    .property instance unsigned int32 'LogLenRandomize'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_LogLenRandomize'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_LogLenRandomize'(unsigned int32)
+    }
+    .property instance unsigned int32 'MaxCacheLengthMB'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxCacheLengthMB'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxCacheLengthMB'(unsigned int32)
+    }
+    .property instance int64 'MaxCheckpointIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxCheckpointIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxCheckpointIntervalSec'(int64)
+    }
+    .property instance unsigned int32 'MaxCheckpoints'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxCheckpoints'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxCheckpoints'(unsigned int32)
+    }
+    .property instance int64 'MaxElectionRandomizeSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxElectionRandomizeSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxElectionRandomizeSec'(int64)
+    }
+    .property instance int64 'MaxLogLenMB'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxLogLenMB'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxLogLenMB'(int64)
+    }
+    .property instance unsigned int32 'MaxLogs'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxLogs'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxLogs'(unsigned int32)
+    }
+    .property instance unsigned int32 'MaxMessageSizeMB'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxMessageSizeMB'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxMessageSizeMB'(unsigned int32)
+    }
+    .property instance unsigned int32 'MaxOutstandingPerReplica'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxOutstandingPerReplica'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxOutstandingPerReplica'(unsigned int32)
+    }
+    .property instance unsigned int32 'MaxVotesInLog'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_MaxVotesInLog'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_MaxVotesInLog'(unsigned int32)
+    }
+    .property instance int64 'NewLeaderGracePeriodSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_NewLeaderGracePeriodSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_NewLeaderGracePeriodSec'(int64)
+    }
+    .property instance unsigned int32 'NumReaderThreads'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_NumReaderThreads'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_NumReaderThreads'(unsigned int32)
+    }
+    .property instance int64 'PrepareRetryIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_PrepareRetryIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_PrepareRetryIntervalSec'(int64)
+    }
+    .property instance unsigned int32 'ReceiveTimeoutSec'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_ReceiveTimeoutSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_ReceiveTimeoutSec'(unsigned int32)
+    }
+    .property instance unsigned int32 'SendTimeoutSec'()
+    {
+      .get instance unsigned int32 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_SendTimeoutSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_SendTimeoutSec'(unsigned int32)
+    }
+    .property instance int64 'VoteRetryIntervalSec'()
+    {
+      .get instance int64 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_VoteRetryIntervalSec'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_VoteRetryIntervalSec'(int64)
+    }
+    .property instance string 'WorkingDir'()
+    {
+      .get instance string 'ManagedRSLib'.'ManagedRSLConfigParam'::'get_WorkingDir'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLConfigParam'::'set_WorkingDir'(string)
+    }
+  }
+  .class public 'ManagedRSLMemberSet'
+    extends ['mscorlib']'System'.'Object'
+    implements ['mscorlib']'System'.'IDisposable'
+  {
+    .method public hidebysig specialname 
+      instance void '.ctor'(class 'ManagedRSLib'.'ManagedRSLNode'[] 'gc_members', unsigned int8[] 'gc_cookie', int32 'offset', int32 'length')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance class 'ManagedRSLib'.'ManagedRSLNode'[] 'get_MemberArray'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int8[] 'get_ConfigurationCookie'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance class 'ManagedRSLib'.'ManagedRSLNode' 'GetMemberInfo'(string 'gc_memberId')
+    {
+      ret
+    }
+    .method family virtual hidebysig newslot 
+      instance void 'Dispose'(bool marshal(unsigned int8) 'A_0')
+    {
+      ret
+    }
+    .method public final virtual hidebysig 
+      instance void 'Dispose'()
+    {
+      ret
+    }
+    .method family virtual hidebysig 
+      instance void 'Finalize'()
+    {
+      ret
+    }
+    .property instance unsigned int8[] 'ConfigurationCookie'()
+    {
+      .get instance unsigned int8[] 'ManagedRSLib'.'ManagedRSLMemberSet'::'get_ConfigurationCookie'()
+    }
+    .property instance class 'ManagedRSLib'.'ManagedRSLNode'[] 'MemberArray'()
+    {
+      .get instance class 'ManagedRSLib'.'ManagedRSLNode'[] 'ManagedRSLib'.'ManagedRSLMemberSet'::'get_MemberArray'()
+    }
+  }
+  .class public 'ManagedRSLNode'
+    extends ['mscorlib']'System'.'Object'
+    implements ['mscorlib']'System'.'IDisposable'
+  {
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance string 'get_MemberId'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MemberId'(string 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance string 'get_HostName'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_HostName'(string 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance class ['System']'System.Net'.'IPAddress' 'get_Ip'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_Ip'(class ['System']'System.Net'.'IPAddress' 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int16 'get_RslPort'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_RslPort'(unsigned int16 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance unsigned int16 'get_RslLearnPort'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_RslLearnPort'(unsigned int16 'value')
+    {
+      ret
+    }
+    .method family virtual hidebysig newslot 
+      instance void 'Dispose'(bool marshal(unsigned int8) 'A_0')
+    {
+      ret
+    }
+    .method public final virtual hidebysig 
+      instance void 'Dispose'()
+    {
+      ret
+    }
+    .method family virtual hidebysig 
+      instance void 'Finalize'()
+    {
+      ret
+    }
+    .field static public unsigned int64 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsConst') 'MaxMemberIdLength'
+    .property instance string 'HostName'()
+    {
+      .get instance string 'ManagedRSLib'.'ManagedRSLNode'::'get_HostName'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLNode'::'set_HostName'(string)
+    }
+    .property instance class ['System']'System.Net'.'IPAddress' 'Ip'()
+    {
+      .get instance class ['System']'System.Net'.'IPAddress' 'ManagedRSLib'.'ManagedRSLNode'::'get_Ip'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLNode'::'set_Ip'(class ['System']'System.Net'.'IPAddress')
+    }
+    .property instance string 'MemberId'()
+    {
+      .get instance string 'ManagedRSLib'.'ManagedRSLNode'::'get_MemberId'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLNode'::'set_MemberId'(string)
+    }
+    .property instance unsigned int16 'RslLearnPort'()
+    {
+      .get instance unsigned int16 'ManagedRSLib'.'ManagedRSLNode'::'get_RslLearnPort'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLNode'::'set_RslLearnPort'(unsigned int16)
+    }
+    .property instance unsigned int16 'RslPort'()
+    {
+      .get instance unsigned int16 'ManagedRSLib'.'ManagedRSLNode'::'get_RslPort'()
+      .set instance void 'ManagedRSLib'.'ManagedRSLNode'::'set_RslPort'(unsigned int16)
+    }
+  }
+  .class public sealed 'ManagedRSLProtocolVersion'
+    extends ['mscorlib']'System'.'Enum'
+  {
+    .field public rtspecialname specialname int32 'value__'
+    .field static public literal valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'ManagedRSLProtocolVersion_1' = int32(0x00000001)
+    .field static public literal valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'ManagedRSLProtocolVersion_2' = int32(0x00000002)
+    .field static public literal valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'ManagedRSLProtocolVersion_3' = int32(0x00000003)
+    .field static public literal valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'ManagedRSLProtocolVersion_4' = int32(0x00000004)
+  }
+  .class public abstract 'ManagedRSLStateMachine'
+    extends ['mscorlib']'System'.'Object'
+    implements ['mscorlib']'System'.'IDisposable', 'ManagedRSLib'.'IManagedRSLCheckpointCreator'
+  {
+    .method public static hidebysig 
+      void 'Init'(string 'logPath')
+    {
+      ret
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance bool marshal(unsigned int8) 'LoadState'(class 'ManagedRSLib'.'ManagedRSLCheckpointStream' 'gc_reader')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'ExecuteReplicatedRequest'(unsigned int8[] 'gc_request', object 'gc_cookie', bool& 'saveState')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'ExecuteFastReadRequest'(unsigned int8[] 'gc_request', object 'gc_cookie')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'AbortRequest'(valuetype 'ManagedRSLib'.'RSLResponse' 'status', object 'gc_cookie')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'SaveState'(class 'ManagedRSLib'.'ManagedRSLCheckpointStream' 'gc_writer')
+    {
+    }
+    .method public virtual hidebysig newslot 
+      instance bool marshal(unsigned int8) 'TrySaveState'(class 'ManagedRSLib'.'ManagedRSLCheckpointStream' 'gc_writer')
+    {
+      ret
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'NotifyStatus'(bool marshal(unsigned int8) 'isPrimary')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'NotifyConfigurationChanged'(object 'gc_cookie')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'AbortChangeConfiguration'(valuetype 'ManagedRSLib'.'RSLResponse' 'status', object 'gc_cookie')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'NotifyPrimaryRecovered'()
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance bool marshal(unsigned int8) 'CanBecomePrimary'(unsigned int8[]& 'data')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance bool marshal(unsigned int8) 'AcceptMessageFromReplica'(class 'ManagedRSLib'.'ManagedRSLNode' 'node', unsigned int8[] 'data')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'ShutDown'(valuetype 'ManagedRSLib'.'RSLResponse' 'status')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'StateSaved'(unsigned int64 'seqNo', string 'fileName')
+    {
+    }
+    .method public virtual hidebysig newslot abstract 
+      instance void 'StateCopied'(unsigned int64 'seqNo', string 'fileName', object 'gc_cookie')
+    {
+    }
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool marshal(unsigned int8) 'Initialize'(class 'ManagedRSLib'.'ManagedRSLConfigParam' 'cfg', class 'ManagedRSLib'.'ManagedRSLNode' 'selfNode', valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'version', bool marshal(unsigned int8) 'serializeFastReadsWithReplicates')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool marshal(unsigned int8) 'Initialize'(class 'ManagedRSLib'.'ManagedRSLConfigParam' 'cfg', class 'ManagedRSLib'.'ManagedRSLNode'[] 'nodes', class 'ManagedRSLib'.'ManagedRSLNode' 'selfNode', valuetype 'ManagedRSLib'.'ManagedRSLProtocolVersion' 'version', bool marshal(unsigned int8) 'serializeFastReadsWithReplicates')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'Bootstrap'(class 'ManagedRSLib'.'ManagedRSLMemberSet' 'gc_memberSet', int32 'timeout')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'ChangeElectionDelay'(unsigned int32 'delayInSecs')
+    {
+      ret
+    }
+    .method public static hidebysig 
+      void 'Unload'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool marshal(unsigned int8) 'Replay'(string 'directory', unsigned int64 'maxSeqNo')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'ReplicateRequest'(unsigned int8[] 'gc_request', int32 'offset', int32 'count', object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'ReplicateRequest'(unsigned int8[] 'gc_request', object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'FastReadRequest'(unsigned int64 'maxSeenSeqNo', unsigned int8[] 'gc_request', int32 'offset', int32 'count', object 'gc_cookie', unsigned int32 'timeout')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'FastReadRequest'(unsigned int64 'maxSeenSeqNo', unsigned int8[] 'gc_request', object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'FastReadRequest'(unsigned int64 'maxSeenSeqNo', unsigned int8[] 'gc_request', int32 'offset', int32 'count', object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'ChangeConfiguration'(class 'ManagedRSLib'.'ManagedRSLMemberSet' 'gc_memberSet', object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool marshal(unsigned int8) 'GetConfiguration'(class 'ManagedRSLib'.'ManagedRSLMemberSet' 'gc_memberSet', unsigned int32& 'gc_configNumber')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance class 'ManagedRSLib'.'ManagedReplicaHealth' 'GetReplicaHealth'(string 'memberId')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance class 'ManagedRSLib'.'ManagedReplicaHealth'[] 'get_MemberSetHealth'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance unsigned int64 'GetCurrentSequenceNumber'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'GetCurrentPrimary'(class 'ManagedRSLib'.'ManagedRSLNode' 'node')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'AllowSaveState'(bool marshal(unsigned int8) 'yes')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance valuetype 'ManagedRSLib'.'RSLResponse' 'CopyStateFromReplica'(object 'gc_cookie')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'Pause'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'Resume'()
+    {
+      ret
+    }
+    .method family virtual hidebysig newslot 
+      instance void 'Dispose'(bool marshal(unsigned int8) 'A_0')
+    {
+      ret
+    }
+    .method public final virtual hidebysig 
+      instance void 'Dispose'()
+    {
+      ret
+    }
+    .method family virtual hidebysig 
+      instance void 'Finalize'()
+    {
+      ret
+    }
+    .property instance class 'ManagedRSLib'.'ManagedReplicaHealth'[] 'MemberSetHealth'()
+    {
+      .get instance class 'ManagedRSLib'.'ManagedReplicaHealth'[] 'ManagedRSLib'.'ManagedRSLStateMachine'::'get_MemberSetHealth'()
+    }
+  }
+  .class public 'ManagedReplicaHealth'
+    extends ['mscorlib']'System'.'Object'
+  {
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance string 'get_MemberId'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_MemberId'(string 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_IsConnected'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_IsConnected'(bool marshal(unsigned int8) 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_IsPrimary'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_IsPrimary'(bool marshal(unsigned int8) 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'get_NumOutstanding'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_NumOutstanding'(int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance valuetype ['mscorlib']'System'.'DateTime' 'get_FailedAt'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_FailedAt'(valuetype ['mscorlib']'System'.'DateTime' 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'get_ConsecutiveFailures'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_ConsecutiveFailures'(int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance valuetype ['mscorlib']'System'.'DateTime' 'get_LastRequestSentAt'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_LastRequestSentAt'(valuetype ['mscorlib']'System'.'DateTime' 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance valuetype ['mscorlib']'System'.'DateTime' 'get_LastRequestVotedAt'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_LastRequestVotedAt'(valuetype ['mscorlib']'System'.'DateTime' 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance bool marshal(unsigned int8) 'get_NeedsResolve'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_NeedsResolve'(bool marshal(unsigned int8) 'value')
+    {
+      ret
+    }
+    .property instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'ConsecutiveFailures'()
+    {
+      .get instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'ManagedRSLib'.'ManagedReplicaHealth'::'get_ConsecutiveFailures'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_ConsecutiveFailures'(int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong'))
+    }
+    .property instance valuetype ['mscorlib']'System'.'DateTime' 'FailedAt'()
+    {
+      .get instance valuetype ['mscorlib']'System'.'DateTime' 'ManagedRSLib'.'ManagedReplicaHealth'::'get_FailedAt'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_FailedAt'(valuetype ['mscorlib']'System'.'DateTime')
+    }
+    .property instance bool 'IsConnected'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedReplicaHealth'::'get_IsConnected'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_IsConnected'(bool)
+    }
+    .property instance bool 'IsPrimary'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedReplicaHealth'::'get_IsPrimary'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_IsPrimary'(bool)
+    }
+    .property instance valuetype ['mscorlib']'System'.'DateTime' 'LastRequestSentAt'()
+    {
+      .get instance valuetype ['mscorlib']'System'.'DateTime' 'ManagedRSLib'.'ManagedReplicaHealth'::'get_LastRequestSentAt'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_LastRequestSentAt'(valuetype ['mscorlib']'System'.'DateTime')
+    }
+    .property instance valuetype ['mscorlib']'System'.'DateTime' 'LastRequestVotedAt'()
+    {
+      .get instance valuetype ['mscorlib']'System'.'DateTime' 'ManagedRSLib'.'ManagedReplicaHealth'::'get_LastRequestVotedAt'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_LastRequestVotedAt'(valuetype ['mscorlib']'System'.'DateTime')
+    }
+    .property instance string 'MemberId'()
+    {
+      .get instance string 'ManagedRSLib'.'ManagedReplicaHealth'::'get_MemberId'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_MemberId'(string)
+    }
+    .property instance bool 'NeedsResolve'()
+    {
+      .get instance bool 'ManagedRSLib'.'ManagedReplicaHealth'::'get_NeedsResolve'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_NeedsResolve'(bool)
+    }
+    .property instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'NumOutstanding'()
+    {
+      .get instance int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong') 'ManagedRSLib'.'ManagedReplicaHealth'::'get_NumOutstanding'()
+      .set instance void 'ManagedRSLib'.'ManagedReplicaHealth'::'set_NumOutstanding'(int32 modopt(['mscorlib']'System.Runtime.CompilerServices'.'IsLong'))
+    }
+  }
+  .class public sealed 'RSLResponse'
+    extends ['mscorlib']'System'.'Enum'
+  {
+    .field public rtspecialname specialname int32 'value__'
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLAlreadyBootstrapped' = int32(0x00000004)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLBootstrapFailed' = int32(0x00000005)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLFastReadStale' = int32(0x00000001)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLInvalidParameter' = int32(0x00000006)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLNotPrimary' = int32(0x00000002)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLShuttingDown' = int32(0x00000003)
+    .field static public literal valuetype 'ManagedRSLib'.'RSLResponse' 'RSLSuccess' = int32(0x00000000)
+  }
+}
+

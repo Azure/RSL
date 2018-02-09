@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{329A4C6F-E0E1-48B3-84DB-A6168C61D895}</ProjectGuid>
+    <TargetName>RSL</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <Import Project="$(SRCROOT)\build\copy.rsl.native.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>RSL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <ModuleDefinitionFile>RSL.def</ModuleDefinitionFile>
+      <AdditionalDependencies>
+        $(BinariesBuildTypeArchDirectory)\RSLib_LF\RSLib_LF.lib;
+        $(BinariesBuildTypeArchDirectory)\RSLib_Common\RSLib_Common.lib;
+        $(BinariesBuildTypeArchDirectory)\RSLib_Network\RSLib_Network.lib;
+        kernel32.lib;
+        user32.lib;
+        Dbghelp.lib;
+        ws2_32.lib;
+        Advapi32.lib;
+        crypt32.lib;
+        Secur32.lib;
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(SRCROOT)\RSL\src\rslconfig.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\message.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\legislator.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\rsl.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\rslutil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SRCROOT)\lib\RSLib.vcxproj">
+      <Project>{828D388E-12C5-4E8A-9DAF-11FC42161C49}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(SRCROOT)\inc\rsl.h">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(SRCROOT)\inc\RSL_changelog.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(SRCROOT)\inc\rsl.contract">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
+</Project>

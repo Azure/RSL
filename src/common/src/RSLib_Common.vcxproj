@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{32AE7413-9F0C-4E5D-87D7-F1CCEA8DC805}</ProjectGuid>
+    <TargetName>RSLib_Common</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="apdiskio.cpp" />
+    <ClCompile Include="BufferedData.cpp" />
+    <ClCompile Include="BufferedSocketReader.cpp" />
+    <ClCompile Include="CmdLineArgParser.cpp" />
+    <ClCompile Include="constants.cpp" />
+    <ClCompile Include="datetime.cpp" />
+    <ClCompile Include="DirUtils.cpp" />
+    <ClCompile Include="fingerprint.cpp" />
+    <ClCompile Include="HiResTime.cpp" />
+    <ClCompile Include="logging.cpp" />
+    <ClCompile Include="marshal.cpp" />
+    <ClCompile Include="msn_fprint.cpp" />
+    <ClCompile Include="PoolLock.cpp" />
+    <ClCompile Include="RefCount.cpp" />
+    <ClCompile Include="sslplumbing.cpp" />
+    <ClCompile Include="StreamIO.cpp" />
+    <ClCompile Include="utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BufferedData.h" />
+    <ClInclude Include="BufferedSocketReader.h" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
+</Project>

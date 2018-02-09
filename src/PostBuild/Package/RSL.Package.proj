@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+
+    <ItemGroup>
+        <ProjectReference Include="$(SRCROOT)\RSL\ManagedSrc\Lib\ManagedRSLib.vcxproj" Condition="'$(_BuildArch)'!='arm64'">
+            <Project>{17EB1580-2E74-4021-AC91-B21502C37375}</Project>
+        </ProjectReference>
+        <ProjectReference Include="$(SRCROOT)\RSL\src\dll\RSL.vcxproj" Condition="'$(_BuildArch)'=='arm64'">
+            <Project>{329A4C6F-E0E1-48B3-84DB-A6168C61D895}</Project>
+        </ProjectReference>
+        <ProjectReference Include="$(SRCROOT)\PostBuild\Codesign\Codesign.proj" Condition="'$(IsOfficialBuild)'=='true' AND '$(_BuildArch)'!='arm64'" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <CustomNuspecFile Include="RSL.$(_BuildArch).nuspec">
+            <IdPrefix>Common.RSL</IdPrefix>
+        </CustomNuspecFile>
+    </ItemGroup>
+
+    <Import Project="$(ExtendedTargetsPath)\NoTarget.targets" />
+</Project>

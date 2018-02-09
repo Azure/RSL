@@ -1,0 +1,9 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+    <ItemGroup>
+        <ProjectFile Include="src\dirs.proj" />
+        <ProjectFile Include="UnitTest\dirs.proj" />
+        <ProjectFile Include="ManagedSrc\dirs.proj" Condition="'$(_BuildArch)'!='arm64'" />
+    </ItemGroup>
+    <Import Project="$(ExtendedTargetsPath)\Traversal.targets" />
+</Project>

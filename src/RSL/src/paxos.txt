@@ -1,0 +1,702 @@
+In order to make logging a little simpler, we restrict the general
+Paxos protocol. Rather than having a separate message protocol to
+convey which decrees have been chosen, we make this implicit in the
+passage of decrees. A Proposal is a triple (b,d,v) where decree d is
+being proposed to have value v under ballot b. Any replica considers
+that a value v for decree d which it accepted in proposal (b,d,v) has
+been chosen if it learns about a proposal (b,d+1,v') for any value v'
+for decree d+1 with ballot b. This scheme is made to work using the
+following restrictions:
+
+  A replica R will never issue any proposal (b,d,v) unless:
+    1) If R has issued any other proposal (b,d,v') then v = v'
+    2) Either R knows that a value has been chosen for decree
+       d-1 proposed with some other ballot b' < b, or a majority of
+       replicas has accepted a proposal (b,d-1,*) from R
+
+Each replica therefore needs to remember only a single proposal p =
+(b,d,v) which has not been chosen. If it learns of any proposal
+(b',d',v') with d' > d+1 or d' == d+1 and b' > b, then it knows it has
+fallen behind and switches to learning mode, where it queries its
+peers for all accepted decrees >= d in order to learn the missing
+state.
+
+When a replica R elects itself primary, it first issues a Prepare
+request for decree d with a new ballot b' > b and learns the freshest
+peer value v'. If the Prepare round is successful, R then proposes
+(b',d,v') and if this is successful it may move on to propose new
+values for decrees d+1,... with ballot b', thus ensuring that v' is
+chosen for decree d.
+
+
+A replica R is in one of three states:
+
+Stable
+
+In this state R believes it knows all chosen decrees, and it has
+accepted exactly one additional decree which may or may not have been
+chosen. If R believes it is primary it will propose periodic decrees
+(whether or not it receives any client commands) to keep the state
+machine advancing. If R is not the primary and no decree is chosen for
+some period of time, R will move to the Initializing state to see if
+it's worth trying to elect itself Primary with a new ballot number. If
+R receives a message indicating that some decree has been chosen which
+R is unaware of, it moves to the Initializing state. If no decrees are
+passed in a long time, R exits and restarts
+
+Initializing
+
+R starts in this state after replaying its log. It also enters the
+initializing state whenever it receives a message which shows that a
+decree has been chosen which R has not heard about, or when no decrees
+have been passed for a while. In the Initializing state, R repeatedly
+sends status requests to all other replicas asking their largest
+accepted decree while caching (but not accepting or logging) newly
+proposed decrees from the current primary. R waits until it hears back
+from a majority of peers. If R does not hear back from a majoriy in a
+long time, it exits and restarts. If it learns of the existence of an
+accepted decree which is not in its log or cached as a recent
+proposal, it requests sufficient decrees from a peer P to fill in the
+gaps while caching (but not accepting or logging) newly proposed
+decrees from the current primary. If it receives sufficient decrees
+from P to fill in all the holes in a timely manner it moves to the
+Stable state after logging and executing all necessary chosen decrees,
+otherwise it stays in the Initializing state and starts over again. R
+does not answer any Prepare or Accept requests in the Initializing
+state.
+
+Preparing
+
+In this state R is trying to elect itself primary. It sends Prepare
+requests to all peers, and if a majority responds R moves to the
+Stable state as primary. If R receives a prepare request with a higher
+ballot number it moves to the Stable state as secondary. If R receives
+a message indicating that some decree has been chosen which R is
+unaware of, it moves to the Initializing state. If R stays in the
+Initializing or Preparing state with no progress being made for too
+long, it exits and restarts.
+
+There are three sources of events for a replica: StartUp() which
+happens once before any other event, Timer() which happens regularly
+no matter what else is going on, and PacketArrival() which happens
+whenever a message arrives from another replica. The following
+pseudo-code explain what a replica should do on receipt of each of
+these events. Each event is assumed to be processed atomically with
+respect to other events.
+
+ReplicaID := int
+Decree := int
+Ballot := (ballotNum: int, replica: ReplicaID)
+ReplicaState := Stable/Initializing/Preparing
+Command := ListOfClientCommands
+Proposal := (ballot: Ballot, decree: Decree, command: Command)
+RemoteState := (maxBallot: Ballot, maxChosen: Decree, lastChosenTime: int)
+LogEntry := Union(accept: Proposal, prepare: Ballot)
+
+local variables
+  self: ReplicaID
+  state: ReplicaState
+  commandQ: Command
+  maxAcceptedProposal: Proposal
+  maxPreparedBallot: Ballot
+  readyToPropose: bool
+  actionTimeOut: int
+  noProgressTime: int
+  nextElectionTime: int
+  lastChosenTime: int
+  proposalQ: List Of Proposal
+  remoteState: HashTable Of RemoteState, keyed by ReplicaID
+  oldFreshestProposal: Proposal
+
+The local replicaID and state are stored in the self and state
+variables. The list of client commands which have been received but
+not yet proposed is stored in commandQ. The most recent proposal
+(which has been accepted but not known to be chosen) is stored in
+maxAcceptedProposal. The most largest ballot number received in any
+Prepare or Accept request is stored in maxPreparedBallot. The flag
+readyToPropose is set to true at the primary when it has received a
+majority of acceptances for its previous proposal. Timeout transitions
+are triggered when actionTimeOut is reached, as follows:
+
+   State             Action
+   -----             ------
+   Stable+Primary    Propose next decree
+   Initializing      Resend status messages
+   Preparing         Resend prepare messages
+
+If noProgressTime is reached, the process exits; this timeout is reset
+whenever the replica logs a new proposal. Every time an accept or
+prepare request is received with a new ballot number higher than the
+previously seen maximum, nextElectionTime is reset. Every time a new
+decree is chosen, nextElectionTime is reset and lastChosenTime is
+recorded. If nextElectionTime expires while in the Stable+Secondary
+state the replica moves to the Initializing state. If the primary
+hasn't proposed a decree in HeartBeatInterval, it proposes an empty
+decree. 
+
+During the Initializing phases, decrees proposed by the
+primary are cached in the FIFO queue proposalQ. When messages which
+need responses are sent to peers, the answers are collected in
+remoteState. In the Preparing state, the freshest old proposal
+learnt during this round are stored in oldFreshestProposal
+
+
+StartUp()
+{
+  maxAcceptedProposal = new Proposal(0, 0, NULL)
+  maxPreparedBallot = 0
+  foreach LogEntry l in LogFile
+  {
+    if (l is an Acceptance)
+    {
+      let p = l.accept
+      assert(p.ballot >= maxAcceptedProposal.ballot)
+      assert(p.decree >= maxAcceptedProposal.decree)
+      if (p.decree > maxAcceptedProposal.decree)
+      {
+        if (maxAcceptedProposal.ballot != 0 ||
+            maxAcceptedProposal.decree != 0)
+        {
+          /* a command can only be chosen if the same ballot number is
+             used to choose both the command and its
+             successor. Proposals which violate this sequence should not
+             have ended up in the log. */
+          assert(p.decree == maxAcceptedProposal.decree+1)
+          assert(p.ballot == maxAcceptedProposal.ballot)
+          AddToExecutionQueue(maxAcceptedProposal.command)
+        }
+      }
+      maxAcceptedProposal = p
+      if (p.ballot > maxPreparedBallot)
+      {
+        maxPreparedBallot = p.ballot
+      }
+    }
+    else /* l is a Preparation */
+    {
+      let b = l.prepare
+      assert(b >= maxPreparedBallot)
+      assert(b >= maxAcceptedProposal.ballot)
+      maxPreparedBallot = b
+    }
+  }
+  /* Assume we are  behind, we will move to stable soon if we are up to data */
+  actionTimeout = infinity
+  nextElectionTime = infinity
+  lastChosenTime = 0
+  noProgressTime = TimeNow() + NoProgressTimeout
+  StartInitializing()
+}
+
+PacketArrival(Message m)
+{
+  switch on m:
+    ReceiveAccept{Req,Rsp}(...)
+    ReceivePrepare{Req,Rsp}(...)
+    ReceiveNotAcceptedRsp(...)
+    ReceiveStatus{Req,Rsp}(...)
+    ReceiveFetchCommands{Req,Rsp}(...)
+}
+
+Timer()
+{
+  if (TimeNow() > noProgressTime)
+  {
+    /* no progress has been made for a long time. Quit and get
+       restarted by the service manager in case the network is
+       wedged */
+    Exit()
+  }
+  if (state == Stable && maxPreparedBallot.replica != self &&
+      TimeNow() > nextElectionTime)
+  {
+    /* no decree has been chosen for a long time so see if we are up
+       to date, and if so start thinking about an election */
+    StartInitializing()
+  }
+
+  if (state == Stable && maxPreparedBallot.replica == self && readyToPropose)
+  {
+      /* we are the primary and we don't have any outstanding proposal. Check
+         if we should send a new proposal (can be empty heartbeat proposal)
+      if (TimeNow() - lastChosenTime > HeartBeatInterval || !commandQ.empty())
+      {
+          SendNextCommand();
+      }
+  }
+
+  if (TimeNow() > actionTimeOut)
+  {
+    if (state == Stable && maxPreparedBallot.replica == self)
+    {
+      /* we are the primary */
+      SendNextCommand()
+    }
+    else if (state == Initializing)
+    {
+      /* the previous attempt to learn timed out */
+      StartInitializing()
+    }
+    else if (state == Preparing)
+    {
+      /* the previous attempt to prepare timed out */
+      StartPreparing()
+    }
+  }
+}
+
+SendNextCommand()
+{
+  /* this is only called when state == Stable and
+     maxPreparedBallot.replica == self */
+  assert(state == Stable && maxPreparedBallot.replica == self)
+  assert(maxPreparedBallot == maxAcceptedProposal.ballot)
+
+  remoteState.DiscardAll()
+
+  if (readyToPropose)
+  {
+    /* our previous proposal has been chosen so it's time for a new
+       one. */
+            
+    let newP = new Proposal(maxAcceptedProposal.ballot,
+                            maxAcceptedProposal.decree+1, commandQ)
+
+    /* first send out the new vote before the log so we don't block
+       behind it */
+    SendCommandToAll(AcceptReq, newP)
+
+    /* now accept it ourselves */
+    LogProposal(newP);
+    commandQ = Empty
+    readyToPropose = false
+  }
+  else
+  {
+    /* send out a re-proposal since we didn't hear back from enough
+       people */
+    SendCommandToAll(AcceptReq, maxAcceptedProposal)
+  }
+
+  actionTimeOut = TimeNow() + ProposalRetryInterval
+}
+
+ReceiveAcceptReq(sender: ReplicaID, p: Proposal)
+{
+  assert(p.ballot.replica == sender && sender != self)
+
+  assert(maxPreparedBallot >= maxAcceptedProposal.ballot)
+  if (state == Stable || state == Preparing)
+  {
+    if (p.decree < maxAcceptedProposal.decree || p.ballot < maxPreparedBallot)
+    {
+      /* the sender is out of date: this will kick it */
+      SendCommandToOne(sender, NotAcceptedRsp, maxPreparedBallot,
+                       maxAcceptedProposal.decree)
+      return
+    }
+    else if (p.decree == maxAcceptedProposal.decree && 
+             p.ballot == maxAcceptedProposal.ballot)
+    {
+      assert(p.command == maxAcceptedProposal.command)
+    }
+    else if ((p.decree == maxAcceptedProposal.decree && 
+              p.ballot > maxAcceptedProposal.ballot) ||
+             (p.decree == maxAcceptedProposal.decree+1 &&
+              p.ballot == maxAcceptedProposal.ballot))
+    {
+      if (p.decree == maxAcceptedProposal.decree+1)
+      {
+        AddToExecutionQueue(maxAcceptedProposal.command)
+        nextElectionTime = TimeNow() + BaseElectionDelay
+      }
+      LogProposal(p);
+
+      SendCommandToOne(sender, AcceptRsp, p.ballot, p.decree)
+      /* make sure we aren't trying to elect ourselves primary */
+      StartBeingStable()
+    }
+    else /* p.decree > maxAcceptedProposal.decree+1 ||
+            p.ballot > maxPreparedBallot */
+    {
+      /* we have fallen behind */
+      StartInitializing()
+    }
+  }
+  else /* state == Initializing */
+  {
+    if (proposalQ.Length() > 0)
+    {
+      let lastP = proposalQ.Tail()
+
+      if (p.decree < lastP.decree || b < lastP.ballot)
+      {
+        if (p.decree < maxAcceptedProposal.decree ||
+            p.ballot < maxPreparedBallot)
+        {
+          /* the sender is out of date: this will kick it, Use the last
+             logged proposal rather than lastP here so we don't falsely
+             claim to have accepted a proposal which we are only caching */
+          SendCommandToOne(sender, NotAcceptedRsp, maxPreparedBallot,
+                           maxAcceptedProposal.decree)
+        }
+        return
+      }
+      if (p.decree == lastP.decree && p.ballot == lastP.ballot)
+      {
+        return
+      }
+      if (proposalQ.Length() == MaxCachedLength)
+      {
+          /* our in-memory cache of recent commands is too long, so
+             throw them away: we will have to learn them from another
+             replica. Only discarding the oldest one would be dangerous
+             here, since we might never catch up */
+          proposalQ.DiscardAll()
+      }
+      if ((p.decree == lastP.decree && p.ballot > lastP.ballot) ||
+          (p.decree == lastP.decree+1 && p.ballot == lastP.ballot))
+      {
+        /* we have a new proposal to add to the cached list */
+        
+        proposalQ.EnQueue(p)
+      }
+      else
+      {
+        /* We've missed some votes in the middle. Clear the vote cache */
+        proposalQ.DiscardAll();
+        proposalQ.Enqueue(p);
+      }
+    }
+    else /* Proposal cache is emptry */
+    {
+      proposalQ.Enqueue(p);
+    }
+  }
+}
+
+ReceiveAcceptRsp(sender: replicaID, b: Ballot, d: decree)
+{
+  if (state == Stable &&
+      maxPreparedBallot == b &&
+      maxAcceptedProposal.decree == d &&
+      maxPreparedBallot.replica == self)
+      readyToPropose == false &&
+  {
+    assert(maxPreparedBallot == maxAcceptedProposal.ballot);
+    remoteState[sender] = (b, d, 0)
+    if ((1+remoteState.NumEntries()) > ReplicaSize/2)
+    {
+      /* a majority has accepted this decree so we can propose the
+         next one when we get to SendNextCommand() */
+      AddToExecutionQueue(maxAcceptedProposal.command)
+      readyToPropose = true
+      actionTimeout = infinity
+    }
+  }
+}
+
+ReceivePrepareReq(sender: ReplicaID, b: Ballot, d: Decree)
+{
+  if (b < maxPreparedBallot || d < maxAcceptedProposal.decree)
+  {
+    /* the sender is out of date: this will kick it */
+    SendCommandToOne(sender, NotAcceptedRsp, maxPreparedBallot,
+                     maxAcceptedProposal.decree)
+  }
+  else if (state == Stable || state == Preparing)
+  {
+    if (b > maxPreparedBallot)
+    {
+      maxPreparedBallot = b
+      LOG(PREPARE, maxPreparedBallot)
+      nextElectionTime = max(nextElectionTime, TimeNow() + NewLeaderGracePeriod)
+      SendCommandToOne(sender, PrepareRsp, b, maxAcceptedProposal)
+    }
+    if (d > maxAcceptedProposal.decree)
+    {
+      /* We've falled behind */
+      StartInitializing()
+    }
+    else
+    {
+      
+      /* make sure we aren't trying to elect ourselves primary */
+      StartBeingStable()
+    }
+  }
+}
+
+ReceivePrepareRsp(sender: replicaID, b: newBallot, p: Proposal)
+{
+  if (state == Preparing &&
+      maxPreparedBallot == b &&
+      maxAcceptedProposal.decree == p.decree)
+  {
+    assert(b.replica == self)
+    if (p.decree == oldFreshestProposal.decree && 
+        p.ballot > oldFreshestProposal.ballot)
+    {
+      oldFreshestProposal = p
+    }
+    remoteState[sender] = (p.ballot, p.decree, 0)
+    if ((1+remoteState.NumEntries()) > ReplicaSize/2)
+    {
+      /* The majority has accepted me as the primary. Repropose the
+         current decree with my new ballot number. */
+      oldFreshestProposal.ballot = maxPreparedballot
+      SendCommandToAll(AcceptReq, oldFreshestProposal)
+      LogProposal(oldFreshestProposal)
+      readyToPropose = false;
+      StartBeingStable()
+    }
+  }
+}
+
+ReceiveNotAcceptedRsp(sender: replicaID, b: newBallot, d: decree)
+{
+  if (d < maxAcceptedProposal.decree || b < maxAcceptedProposal.ballot)
+  {
+     return;
+  }
+
+  if (state == Stable || state == Preparing)
+  {
+    if (d > maxAcceptedProposal.decree)
+    {
+      /* There is a decree that I don't know about */ 
+      StartInitializing();
+    }
+    else if (b > maxPreparedBallot)
+    {
+      maxPreparedBallot = b
+      LOG(PREPARE, maxPreparedBallot)
+      nextElectionTime = max(nextElectionTime, TimeNow() + NewLeaderGracePeriod)
+      
+      StartBeingStable();
+    }
+  }
+}
+
+ReceiveStatusReq(sender: ReplicaID)
+{
+  SendCommandToOne(sender, StatusRsp, maxAcceptedProposal.ballot,
+                   maxAcceptedProposal.decree, lastChosenTime)
+}
+
+ReceiveStatusRsp(sender: ReplicaID, b: Ballot, d: Decree, t: int)
+{
+  if (state != Initializing)
+  {
+    // This is to avoid the scenario where a minority of the replicas
+    // have a higher decree and majority has the same decree number as ours
+    // While learning, the majority with same decree  would respond and we
+    // would move to preparing. In preparing, somebody from the minority
+    // reject out prepare since they have a higher decree. We will then
+    // move back to learning, where the majority would say that no decree
+    // has been passed. To break this cycle, we have to learn even if
+    // we are not in the learning state.
+    if (b >= maxAcceptedVote.ballot && 
+        d == maxAcceptedVote.decree && 
+        proposalQ.Head() == NULL)
+    {
+       learnVotes(sender)
+       return
+    }
+  }
+  else
+  {
+    remoteState[sender] = (b, d, t)
+    if (1+remoteState.NumEntries() > ReplicaSize/2)
+    {
+      if (proposalQ.Length > 0)
+      {
+        let minNeededDecree = proposalQ.Head().decree
+
+        assert(minNeededDecree >= maxAcceptedProposal.decree)
+
+        /* choose the replica to contact at random, since in general the
+           primary is likely to have the highest chosen value but we
+           don't want to swamp it with recovery traffic */
+        let replicaToContact =
+          RandomChoose from remoteState where
+            (remoteState[replicaToContact].maxChosen >= minNeededDecree)
+             
+        if (replicaToContact != NULL)
+        {
+          LearnVotes(replicaToContact);
+          return;
+        }
+      }
+
+      /* either we don't have any cached proposals, or we couldn't
+         find any replica to fill all the gaps. Check if anybody
+         has accepted a proposal higher than maxAcceptedProposal */
+
+      let minNeededDecree = maxAcceptedProposal.decree
+      let minNeededBallot = maxAcceptedProposal.ballot
+        
+      let replicaToContact =
+      RandomChoose from remoteState where
+          ((remoteState[replicaToContact].maxChosen == minNeededDecree && 
+            remoteState[replicaToContact].maxBallot > minNeededBallot) ||
+           (remoteState[replicaToContact].maxChosen > minNeededDecree &&
+            remoteState[replicaToContact].maxBallot >= minNeedBallot))
+      if (replicaToContact != NULL)
+      {
+        LearnVotes(replicaToContact);
+        return;
+      }
+      
+      /* No body has accepted a decree higher than maxAcceptedProposal. */
+      
+      if (nextElectionTime == infinity)
+      {
+        /* This is true only at the beginning when we start up. If we
+           got here it means that no decree has been chosen between
+           the time I stopped and restarted. To be conserative, use
+           the max lastChosen time of the replicas */
+
+        let maxChosen = max over r (remoteStatus[r].lastChosen)
+        nextElectionTime = min(TimeNow(), maxChosen) + BaseElectionDelay
+      }
+      if (TimeNow() >= nextElectionTime || maxPreparedBallot.replica == self)
+      {
+        /* If I was primary when I stopped last time and there is no new
+           primary, try electing myself as the primary again */
+        StartPreparing();
+      }
+      else
+      {
+        /* wait until a new proposal is proposed or newElectionTime reaches */
+        StartBeingStable();
+      }
+    }
+  }
+}
+
+ReceiveFetchCommandsReq(sender: ReplicaID, minD: Decree, maxD: decree)
+{
+  let pList = List of Proposal p in Log where
+    p.decree >= minD && p.decree <= maxD
+  SendCommandToOne(sender, FetchCommandsRsp, pList)
+}
+
+LearnVotes(replica: ReplicaID)
+{
+  let minNeeded = (proposalQ.size()) ? proposalQ.head() : null
+
+  SendCommandToOne(replica, FetchCommandReq, 
+                   maxAcceptedProposal.decree, maxAcceptedProposal.ballot)
+
+  while (p = read next proposal from replica)
+  {
+    if (p.decree <= maxAcceptedVote.decree || p.ballot <= maxAcceptedVote.ballot)
+    {
+      continue
+    }
+    // we missed a vote in the middle
+    if (p.decree == maxAcceptedVote.decre+1 && p.ballot > maxAcceptedVote.ballot)
+    {
+      let missingP = new Proposal(maxAcceptedProposal.ballot,
+                                  maxAcceptedProposal.decree+1, p.command)
+      AddToExecutionQueue(maxAcceptedProposal.command)
+      nextElectionTime = TimeNow() + BaseElectionDelay
+      LogProposal(newP);
+    }
+    assert((p.decree == maxAcceptedProposal.decree && 
+            p.ballot >= maxAcceptedProposal.ballot) ||
+           (p.decree == maxAcceptedProposal.decree+1 &&
+            p.ballot == maxAcceptedProposal.ballot))
+
+    if (p.decree == maxAcceptedProposal.decree+1)
+    {
+      AddToExecutionQueue(maxAcceptedProposal.command)
+      nextElectionTime = TimeNow() + BaseElectionDelay
+    }
+    LogProposal(p);
+
+    if (!minNeeded || minNeeded.decree <= p.decree)
+    {
+      /* play all the cached proposals */
+      while (proposalQ.length() > 0)
+      {
+        let p = proposalQ.Dequeue();
+        if (p.decree == maxAcceptedProposal.decree+1)
+        {
+          AddToExecutionQueue(maxAcceptedProposal.command)
+          nextElectionTime = TimeNow() + BaseElectionDelay
+        }
+        LogProposal(p);
+      }
+      StartBeingStable();
+      return
+    }
+  }
+  /* Didn't get all the proposals. */
+  StartInitializing()
+}
+
+StartInitializing()
+{
+  state = Initializing
+  remoteState.DiscardAll()
+  SendCommandToAll(StatusReq)
+  actionTimeOut = TimeNow() + InitializeRetryInterval
+}
+
+StartPreparing()
+{
+  if (state == Initializing)
+  {
+    state = Preparing
+    /* we got sent here at the end of an initialization when we found
+       out we were up to date with no recent ballots chosen: pick a
+       new ballot number */
+    maxPreparedBallot.replica = self
+    maxPreparedBallot.ballotNum += 1
+    LOG(PREPARE, maxPreparedBallot)
+    nextElectionTIme = TimeNow() + NewLeaderGracePeriod
+  }
+  else
+  {
+    assert(state == Preparing)
+  }
+  oldFreshestProposal = maxAcceptedProposal
+  remoteState.DiscardAll()
+  SendCommandToAll(PrepareReq,
+                   maxPreparedBallot, maxAcceptedProposal.decree)
+  actionTimeOut = TimeNow() + PrepareRetryInterval
+}
+
+StartBeingStable()
+{
+  oldState = state;
+  state = Stable;
+  remoteState.DiscardAll()
+  if (maxPreparedBallot.replica == self)
+  {
+    /* we can only come here from the preparing state */
+    assert(oldState == Preparing)
+    actionTimeout = TimeNow() + VoteRetryInterval
+  }
+  else
+  {
+    /* we are not primary, so just wait for something to happen */
+    actionTimeOut = Infinity
+  }
+}
+
+LogProposal(newP: Proposal)
+{
+  LOG(ACCEPT, newP)
+  maxAcceptedProposal = newP
+  lastChosenTime = TimeNow()
+  noProgressTime = TimeNow() + NoProgressTimeout
+  if (newP.ballot > maxPreparedBallot)
+  {
+    maxPreparedBallot = newP.ballot
+    nextElectionTime = max(nextElectionTime, TimeNow() + NewLeaderGracePeriod)
+  }
+}
+  

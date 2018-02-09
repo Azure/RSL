@@ -1,0 +1,13 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+    <ItemGroup>
+        <ProjectFile Include="LF\RSLib_LF.vcxproj" />
+        <ProjectFile Include="common\dirs.proj" />
+        <ProjectFile Include="networklib\dirs.proj" />
+        <ProjectFile Include="rsl\dirs.proj" />
+        <ProjectFile Include="lib\RSLib.vcxproj" />
+        <ProjectFile Include="UnitTest\dirs.proj" />
+        <ProjectFile Include="PostBuild\dirs.proj" />
+    </ItemGroup>
+    <Import Project="$(ExtendedTargetsPath)\Traversal.targets" />
+</Project>

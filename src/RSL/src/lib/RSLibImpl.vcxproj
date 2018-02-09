@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>RSLibImpl</TargetName>
+    <ProjectGuid>{7EC28EFA-B156-49A5-A1EF-646B9C954A3A}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemGroup>
+    <ClCompile Include="$(SRCROOT)\RSL\src\rslconfig.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\message.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\legislator.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\rsl.cpp" />
+    <ClCompile Include="$(SRCROOT)\RSL\src\rslutil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
+</Project>

@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>RSLNetTest</TargetName>
+    <ProjectGuid>{A8B9C539-ADC0-49C3-9780-DFB975A8419B}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+    <GenerateAssemblyFileVersion>false</GenerateAssemblyFileVersion>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>
+        %(PreprocessorDefinitions);
+        _CRT_SECURE_NO_WARNINGS;
+        RSL_NO_STL
+      </PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SRCROOT)\lib\RSLib.vcxproj">
+      <Project>{828D388E-12C5-4E8A-9DAF-11FC42161C49}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SRCROOT)\UnitTest\src\RSLib_UnitTest.vcxproj">
+      <Project>{DAC80593-F046-4E99-8F82-5B8F8DA6B10F}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>
+        $(BinariesBuildTypeArchDirectory)\RSLib\RSLib.lib;
+        $(BinariesBuildTypeArchDirectory)\RSLib_UnitTest\RSLib_UnitTest.lib;
+        kernel32.lib;
+        user32.lib;
+        Dbghelp.lib;
+        ws2_32.lib;
+        Crypt32.lib;
+        Advapi32.lib;
+        Secur32.lib;
+      </AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="RSLNetTest.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+  </Target>
+</Project>

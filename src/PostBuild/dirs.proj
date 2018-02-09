@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+    
+    <ItemGroup>
+        <!-- For official build performed in WA build lab, always do the signing.  Otherwise skip it. -->
+        <ProjectFile Include="Codesign\Codesign.proj" Condition="'$(IsOfficialBuild)'=='true' AND '$(_BuildArch)'!='arm64'" />
+        <ProjectFile Include="Package\RSL.Package.proj" Condition="'$(IsOfficialBuild)'=='true'" />
+    </ItemGroup>
+    
+    <Import Project="$(ExtendedTargetsPath)\Traversal.targets" />
+</Project>

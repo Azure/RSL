@@ -1,0 +1,13 @@
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+    <ItemGroup>
+        <ProjectFile Include="Lib\ManagedRSLib.vcxproj" />
+        <ProjectFile Include="TestLib\ManagedRSLBasicTest.csproj" />
+        <ProjectFile Include="RSLStressTest\RSLStressTest.csproj" />
+        <ProjectFile Include="SampleApp\SampleApp.csproj" />
+        <ProjectFile Include="ManagedNetTest\ManagedNetTest.csproj" />
+        <ProjectFile Include="StressApp\StressApp.csproj" />
+    </ItemGroup>
+    <Import Project="$(ExtendedTargetsPath)\Traversal.targets" />
+</Project>
+

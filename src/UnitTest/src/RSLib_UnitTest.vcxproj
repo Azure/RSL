@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>RSLib_UnitTest</TargetName>
+    <ProjectGuid>{DAC80593-F046-4E99-8F82-5B8F8DA6B10F}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" >
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemDefinitionGroup >
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="assertinfo.cpp" />
+    <ClCompile Include="case.cpp" />
+    <ClCompile Include="suite.cpp" />
+    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="StringUtils.cpp" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+</Project>
+
+
+

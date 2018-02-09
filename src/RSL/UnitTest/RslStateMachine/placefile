@@ -1,0 +1,3 @@
+rsltest.exe target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslStateMachine
+rsltest.pdb target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslStateMachine
+rsltest.cov target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslStateMachine

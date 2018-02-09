@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>RSLib_Network</TargetName>
+    <ProjectGuid>{28891004-80F9-4859-9994-8419CD2C515D}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" >
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemGroup>
+    <ClCompile Include="NetBuffer.cpp" />
+    <ClCompile Include="NetAccept.cpp" />
+    <ClCompile Include="NetProcessor.cpp" />
+    <ClCompile Include="NetVConnection.cpp" />
+    <ClCompile Include="NetPacket.cpp" />
+    <ClCompile Include="PacketUtil.cpp" />
+    <ClCompile Include="NetCxn.cpp" />
+    <ClCompile Include="NetSSLCxn.cpp" />
+    <ClCompile Include="NetPacketSvc.cpp" />
+    <ClCompile Include="BufferPool.cpp" />
+    <ClCompile Include="NetCommon.cpp" />
+    <ClCompile Include="SSLImpl.cpp" />
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

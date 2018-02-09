@@ -1,0 +1,2 @@
+rslmigrationtest.exe target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslmigrationtest
+MigrationTestHarnessInput.txt target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslmigrationtest

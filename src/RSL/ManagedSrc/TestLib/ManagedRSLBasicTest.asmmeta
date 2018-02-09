@@ -1,0 +1,206 @@
+.assembly extern 'ManagedRSLib'
+{
+  .publickeytoken = (31 BF 38 56 AD 36 4E 35)
+  .ver windows
+}
+.assembly extern 'mscorlib'
+{
+  .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+  .ver clr2.0
+}
+.assembly 'ManagedRSLBasicTest'
+{
+  .custom instance void ['mscorlib']'System.Runtime.CompilerServices'.'CompilationRelaxationsAttribute'::.ctor(int32) = (01 00 08 00 00 00 00 00)
+  .custom instance void ['mscorlib']'System.Runtime.CompilerServices'.'RuntimeCompatibilityAttribute'::.ctor() = (01 00 01 00 54 02 16 57 72 61 70 4E 6F 6E 45 78 63 65 70 74 69 6F 6E 54 68 72 6F 77 73 01)
+  .custom instance void ['mscorlib']'System.Runtime.InteropServices'.'ComVisibleAttribute'::.ctor(bool) = (01 00 00 00 00)
+  .hash algorithm 0x00008004
+  .ver windows
+}
+.namespace 'ManagedRSLBasicTest'
+{
+  .class public 'Application'
+    extends ['mscorlib']'System'.'Object'
+  {
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'Unload'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'CleanUp'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance int32 'StartUp'(int32 'numberOfReplicas')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'Pause'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance void 'Resume'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool 'ReplicateCommand'(int32 'newState')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance bool 'ExecuteFastRead'(int32 'secuence')
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance int32 'GetState'()
+    {
+      ret
+    }
+    .method public hidebysig 
+      instance int32 'GetStableReplicas'()
+    {
+      ret
+    }
+    .field static public class ['mscorlib']'System.Collections'.'ArrayList' '_allReplicaSet'
+    .field static public class ['mscorlib']'System.Collections'.'ArrayList' '_pausedReplicas'
+    .field static public class ['mscorlib']'System.Collections'.'ArrayList' '_replicaSet'
+  }
+  .class public 'BasicRSLTestMachine'
+    extends ['ManagedRSLib']'ManagedRSLib'.'ManagedRSLStateMachine'
+  {
+    .method public hidebysig specialname 
+      instance int32 'get_InternalState'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_InternalState'(int32 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void '.ctor'()
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance bool 'LoadState'(class ['ManagedRSLib']'ManagedRSLib'.'ManagedRSLCheckpointStream' 'stream')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'ExecuteReplicatedRequest'(unsigned int8[] 'rawRequest', object 'cookie', bool& 'saveState')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'ExecuteFastReadRequest'(unsigned int8[] 'rawRequest', object 'cookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'AbortRequest'(valuetype ['ManagedRSLib']'ManagedRSLib'.'RSLResponse' 'status', object 'cookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'NotifyConfigurationChanged'(object 'cookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'AbortChangeConfiguration'(valuetype ['ManagedRSLib']'ManagedRSLib'.'RSLResponse' 'status', object 'cookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'SaveState'(class ['ManagedRSLib']'ManagedRSLib'.'ManagedRSLCheckpointStream' 'stream')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'NotifyStatus'(bool 'isPrimary')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'NotifyPrimaryRecovered'()
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'ShutDown'(valuetype ['ManagedRSLib']'ManagedRSLib'.'RSLResponse' 'status')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance bool 'CanBecomePrimary'(unsigned int8[]& 'primaryCookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance bool 'AcceptMessageFromReplica'(class ['ManagedRSLib']'ManagedRSLib'.'ManagedRSLNode' 'node', unsigned int8[] 'primaryCookie')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'StateSaved'(unsigned int64 'seqNo', string 'fileName')
+    {
+      ret
+    }
+    .method public virtual hidebysig 
+      instance void 'StateCopied'(unsigned int64 'seqNo', string 'fileName', object 'cookie')
+    {
+      ret
+    }
+    .property instance int32 'InternalState'()
+    {
+      .get instance int32 'ManagedRSLBasicTest'.'BasicRSLTestMachine'::'get_InternalState'()
+      .set instance void 'ManagedRSLBasicTest'.'BasicRSLTestMachine'::'set_InternalState'(int32)
+    }
+  }
+  .class public 'UserRequest'
+    extends ['mscorlib']'System'.'Object'
+  {
+    .method public hidebysig specialname 
+      instance unsigned int64 'get_Response'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void 'set_Response'(unsigned int64 'value')
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance int32 'get_Request'()
+    {
+      ret
+    }
+    .method public hidebysig specialname 
+      instance void '.ctor'(int32 'request')
+    {
+      ret
+    }
+    .property instance int32 'Request'()
+    {
+      .get instance int32 'ManagedRSLBasicTest'.'UserRequest'::'get_Request'()
+    }
+    .property instance unsigned int64 'Response'()
+    {
+      .get instance unsigned int64 'ManagedRSLBasicTest'.'UserRequest'::'get_Response'()
+      .set instance void 'ManagedRSLBasicTest'.'UserRequest'::'set_Response'(unsigned int64)
+    }
+  }
+}
+

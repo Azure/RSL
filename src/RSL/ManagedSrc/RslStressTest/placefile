@@ -1,0 +1,2 @@
+RSLStressTest.exe target\distrib\%BUILDTYPE%\%BUILDTARGET%\test\RSL
+RSLStress.pl target\distrib\%BUILDTYPE%\%BUILDTARGET%\test\RSL

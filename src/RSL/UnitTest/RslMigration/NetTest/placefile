@@ -1,0 +1,2 @@
+rslmigrationtestclient.exe target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslmigrationtest
+config.ini target\distrib\%BUILDTYPE%\%BUILDTARGET%\unittest\rslmigrationtest

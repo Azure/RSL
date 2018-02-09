@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Import order is significant. $(Platform) needs to be correctly set by
+       the project configurations before including Microsoft.Cpp.Default.props. -->
+  <Import Project="$(SRCROOT)\build\configs.props" />
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.Default.props" />
+  
+  <PropertyGroup>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <TrackFileAccess>false</TrackFileAccess>
+
+    <!--
+      Default to false, since V140 default corext targets cause undesired behaviour.
+      We will set appropriate ItemDefinitionGroup settings manually.
+    -->
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+      <!--
+        By default (since MsBuild 14) when WholeProgramOptimization is turned on LinkTimeCodeGeneration is set to UseFastLinkTimeCodeGeneration.
+        This produces an additional 100G of .iobj/.ipdb files which get placed to the drop share and serve no purpose.
+      -->
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration Condition="'$(IsOfficialBuild)' == 'true'">UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Platform)'=='arm64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_M_ARM64;_ARM64_;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_M_AMD64;_AMD64_;_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
+  <PropertyGroup Label="Configuration">
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32_LEAN_AND_MEAN;</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>
+        %(AdditionalIncludeDirectories);
+        $(SRCROOT)\inc;
+        $(SRCROOT)\lf;
+        $(SRCROOT)\RSL\src;
+        $(SRCROOT)\common\src;
+        $(SRCROOT)\NetworkLib\inc; 
+        $(PkgWindowsSdk_Corext)\Include\$(WindowsTargetPlatformVersion)\um;
+        $(PkgWindowsSdk_Corext)\Include\$(WindowsTargetPlatformVersion)\shared;
+        $(PkgWindowsSdk_Corext)\Include\$(WindowsTargetPlatformVersion)\ucrt;
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+        %(AdditionalLibraryDirectories);
+        $(PkgWindowsSdk_Corext)\lib\$(WindowsTargetPlatformVersion)\um\$(Platform);
+        $(PkgWindowsSdk_Corext)\lib\$(WindowsTargetPlatformVersion)\ucrt\$(Platform);
+        $(PkgVisualCpp_Corext)\lib\$(Platform)
+      </AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.props" />
+
+</Project>

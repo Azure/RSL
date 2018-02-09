@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>RSLib</TargetName>
+    <ProjectGuid>{828D388E-12C5-4E8A-9DAF-11FC42161C49}</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <ItemGroup>
+    <ProjectReference Include="$(SRCROOT)\LF\RSLib_LF.vcxproj">
+      <Project>{C1F3E581-9AB1-4873-A5D2-1C7D9A4D8DA5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SRCROOT)\common\src\RSLib_Common.vcxproj">
+      <Project>{32AE7413-9F0C-4E5D-87D7-F1CCEA8DC805}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SRCROOT)\NetworkLib\src\RSLib_Network.vcxproj">
+      <Project>{28891004-80F9-4859-9994-8419CD2C515D}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SRCROOT)\RSL\src\lib\RSLibImpl.vcxproj">
+      <Project>{7EC28EFA-B156-49A5-A1EF-646B9C954A3A}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+  <PropertyGroup>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CustomBuildAfterTargets>Build</CustomBuildAfterTargets>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <CustomBuildStep>
+      <Command>$(PkgVisualCpp_Corext)\bin\x64\$(_BuildArch)\lib.exe /OUT:$(BinariesBuildTypeArchDirectory)\$(TargetName)\$(TargetName)$(TargetExt) "$(BinariesBuildTypeArchDirectory)\RSLib_LF\RSLib_LF.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Common\RSLib_Common.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Network\RSLib_Network.lib" "$(BinariesBuildTypeArchDirectory)\RSLibImpl\RSLibImpl.lib" /MACHINE:$(Platform) /NOLOGO /LIBPATH:$(BinariesBuildTypeArchDirectory)</Command>
+      <Outputs>$(Out)$(TargetName)$(TargetName)$(TargetExt);%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+</Project>

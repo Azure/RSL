@@ -1,0 +1,1 @@
+ManagedRSLBasicTest.dll target\distrib\%BUILDTYPE%\%BUILDTARGET%\test\Models\RSL:target\distrib\%BUILDTYPE%\%BUILDTARGET%\test\RSL

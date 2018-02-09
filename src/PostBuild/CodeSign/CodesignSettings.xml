@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CodeSignSettings xmlns="IdCodeSign/CodeSignSettings">
+    <Product>Common-RSL</Product>
+    <BuildNumber>%BuildNumber%</BuildNumber>
+    <SourceControlServer>vstfrd:8080/Azure/One/_git</SourceControlServer>
+    <BranchName>master</BranchName>  
+    <Description>ManagedRSLib library</Description>
+    <SourcePath>%BinariesBuildTypeArchDirectory%\Binaries</SourcePath>
+    <StrongNameCert>72</StrongNameCert>
+    <AuthenticodeCert>402</AuthenticodeCert>
+    <FileDescription>ManagedRSLib</FileDescription>
+    <BatchDescription>ManagedRSLib Signing</BatchDescription>
+    <Approvers>mmalin;daviddio</Approvers>
+    <Keywords>Common-RSL ManagedRSLib</Keywords>
+
+    <CopyBack>true</CopyBack>
+
+    <FileData>
+        <Files>
+            <File>%BinariesBuildTypeArchDirectory%\Binaries\ManagedRSLib.dll</File>
+        </Files>
+    </FileData>
+</CodeSignSettings>

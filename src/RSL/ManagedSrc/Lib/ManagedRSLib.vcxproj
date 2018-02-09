@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(EnvironmentConfig)" />
+  <PropertyGroup Label="Globals">
+    <TargetName>ManagedRSLib</TargetName>
+    <ProjectGuid>{17EB1580-2E74-4021-AC91-B21502C37375}</ProjectGuid>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+    <EmbedManifest>false</EmbedManifest>
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LinkDelaySign>true</LinkDelaySign>
+    <SignAssembly>true</SignAssembly>
+    <KeyFile>$(SRCROOT)\build\35MSSharedLib1024.snk</KeyFile>
+    <AssemblyOriginatorKeyFile>$(SRCROOT)\build\35MSSharedLib1024.snk</AssemblyOriginatorKeyFile>
+    <LinkKeyFile Condition="'$(LinkKeyFile)'==''">$(AssemblyOriginatorKeyFile)</LinkKeyFile>
+  </PropertyGroup>
+  <Import Project="$(SRCROOT)\build\native.props" />
+  <Import Project="$(SRCROOT)\build\copy.rsl.managed.props" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>RSL_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4793</DisableSpecificWarnings>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="RSLStateMachineWrapper.cpp" />
+    <ClCompile Include="ManagedRSLib.cpp" />
+    <ClCompile Include="Checkpoint.cpp" />
+  </ItemGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalDependencies>
+        $(BinariesBuildTypeArchDirectory)\RSL\RSL.lib;
+        kernel32.lib;
+        Secur32.lib;
+      </AdditionalDependencies>
+      <DelayLoadDLLs>RSL.dll</DelayLoadDLLs>
+    </Link>
+    <ClCompile>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SRCROOT)\RSL\src\dll\RSL.vcxproj">
+      <Project>{329A4C6F-E0E1-48B3-84DB-A6168C61D895}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(SRCROOT)\RSL\ManagedSrc\Lib\ManagedRSL.contract">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>  
+  <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

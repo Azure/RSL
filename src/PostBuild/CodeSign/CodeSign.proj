@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <Import Project="$(EnvironmentConfig)" />
+
+    <ItemGroup>
+        <ProjectReference Include="$(SRCROOT)\RSL\ManagedSrc\Lib\ManagedRSLib.vcxproj" Condition="'$(_BuildArch)'!='arm64'" >
+            <Project>{17EB1580-2E74-4021-AC91-B21502C37375}</Project>
+        </ProjectReference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <Platform Condition="'$(Platform)'==''">x64</Platform>
+        <Enable_PRS_DelaySign Condition="'$(IsOfficialBuild)'=='true'">1</Enable_PRS_DelaySign>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <CodesignSettings Include="CodesignSettings.xml" />
+    </ItemGroup>
+
+    <Import Project="$(PkgCodesign_AD)\Codesign.targets" />
+</Project>

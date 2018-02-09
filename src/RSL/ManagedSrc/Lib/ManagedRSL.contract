@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<contract xmlns="http://schemas.microsoft.com/azure/engineering/contracts/2009/02">
+    <name>RSL.Managed</name>
+    <version>1.4.0.0</version>
+    <visibility>internal</visibility>
+    <items>
+        <item include="ManagedRSLib.dll" type="assembly">
+            <source>ManagedRSLib.h</source>
+        </item>
+    </items>
+</contract>

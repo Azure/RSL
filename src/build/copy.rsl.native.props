@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
+  <ItemGroup>
+    <PostBuildCopy Include="$(BinariesBuildTypeArchDirectory)\RSL\RSL.dll">
+      <DestinationFolder>$(OutBinDir)</DestinationFolder>
+    </PostBuildCopy>
+    <PostBuildCopy Include="$(BinariesBuildTypeArchDirectory)\RSL\RSL.pdb">
+      <DestinationFolder>$(OutBinDir)</DestinationFolder>
+    </PostBuildCopy>
+    <PostBuildCopy Include="$(BinariesBuildTypeArchDirectory)\RSL\RSL.lib">
+      <DestinationFolder>$(OutBinDir)</DestinationFolder>
+    </PostBuildCopy>
+    <PostBuildCopy Include="$(BinariesBuildTypeArchDirectory)\RSL\RSL.h">
+      <DestinationFolder>$(OutBinDir)</DestinationFolder>
+    </PostBuildCopy>
+  </ItemGroup>
+</Project>
