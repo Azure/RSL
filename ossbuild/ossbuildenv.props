@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MsBuildAllProjects>$(MsBuildAllProjects);$(MsBuildThisFileFullPath)</MsBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ExtendedTargetsPath>$(REPOROOT)\ossbuild</ExtendedTargetsPath>
+    
+    <ObjectRoot Condition="'$(ObjectRoot)' == ''">$(OBJECT_ROOT)</ObjectRoot>
+    <OutputRoot Condition="'$(OutputRoot)' == ''">$(_NTTREE)</OutputRoot>
+
+    <ObjectRoot Condition="'$(ObjectRoot)' == ''">$(BaseDir)\out\obj</ObjectRoot>
+    <OutputRoot Condition="'$(OutputRoot)' == ''">$(BaseDir)\out\bin</OutputRoot>
+
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+
+    <DefaultBuildArchitecture Condition="'$(_defaultBuildArch)' != ''">$(_defaultBuildArch)</DefaultBuildArchitecture>
+    <DefaultBuildArchitecture Condition="'$(DefaultBuildArchitecture)' == ''">amd64</DefaultBuildArchitecture>
+    <DefaultBuildArchitecture Condition="'$(DefaultBuildArchitecture)' == 'x64'">amd64</DefaultBuildArchitecture>
+
+    <BuildArchitecture Condition="'$(_BuildArch)' != ''">$(_BuildArch)</BuildArchitecture>
+    <BuildArchitecture Condition="'$(BuildArchitecture)' == '' AND '$(Platform)' == 'x64'">amd64</BuildArchitecture>
+    <BuildArchitecture Condition="'$(BuildArchitecture)' == ''">$(DefaultBuildArchitecture)</BuildArchitecture>
+
+    <BuildType Condition="'$(Configuration)' == 'Release'">retail</BuildType>
+    <BuildType Condition="'$(BuildType)' == ''">debug</BuildType>
+
+    <BUILD_ALT_DIR Condition="'$(BUILD_ALT_DIR)'=='' AND '$(BuildType)'=='debug'">d</BUILD_ALT_DIR>
+    <ObjectDirectory Condition="'$(ObjectDirectory)' == ''">obj$(BUILD_ALT_DIR)</ObjectDirectory>
+    <BaseIntermediateOutputPath>$(ObjectDirectory)\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)$(BuildArchitecture)\</IntermediateOutputPath>
+    <O>$(IntermediateOutputPath)</O>
+    <ProjectDirRelativeToBaseDir>$(MSBuildProjectDirectory.Substring($(BaseDir.Length)))</ProjectDirRelativeToBaseDir>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(ObjectRoot)$(ProjectDirRelativeToBaseDir)\$(O)</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+
+    <VanillaSfproj>true</VanillaSfproj>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' " />
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|amd64' " />
+
+  <!-- Redirect to system default props -->
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
+          Condition="'$(MSBuildProjectExtension)' != '.vcxproj' and '$(MSBuildProjectExtension)' != '.nuproj'" />
+
+  <!-- Need to get all PkgXXX figured out -->
+  <Import Project="$(REPOROOT)\ossbuild\packageList.props" />
+  <Import Project="$(CONFROOT)\build.props" />
+
+  <!-- Redirect CoreXT nupkgs to standard locations -->
+  <PropertyGroup>
+    <PkgDotNetFxRefAssemblies_Corext>$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2</PkgDotNetFxRefAssemblies_Corext>
+    <PkgMsTest_Corext>$(DevEnvDir)\PublicAssemblies</PkgMsTest_Corext>
+    <!-- Bug in NuProj -->
+    <NuGetToolPath>$(PkgNuproj)\tools</NuGetToolPath>
+  </PropertyGroup>
+
+  <!-- For projects depended by nuproj. CustomAfterMicrosoftCommonTargets? -->
+  <Import Project="$(PkgNuproj)\tools\Microsoft.Common.Nuproj.targets" />
+</Project>

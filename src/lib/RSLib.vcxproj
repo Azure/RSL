@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <CustomBuildStep>
-      <Command>$(PkgVisualCpp_Corext)\bin\x64\$(_BuildArch)\lib.exe /OUT:$(BinariesBuildTypeArchDirectory)\$(TargetName)\$(TargetName)$(TargetExt) "$(BinariesBuildTypeArchDirectory)\RSLib_LF\RSLib_LF.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Common\RSLib_Common.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Network\RSLib_Network.lib" "$(BinariesBuildTypeArchDirectory)\RSLibImpl\RSLibImpl.lib" /MACHINE:$(Platform) /NOLOGO /LIBPATH:$(BinariesBuildTypeArchDirectory)</Command>
+      <Command>$(LibCmd) /OUT:$(BinariesBuildTypeArchDirectory)\$(TargetName)\$(TargetName)$(TargetExt) "$(BinariesBuildTypeArchDirectory)\RSLib_LF\RSLib_LF.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Common\RSLib_Common.lib" "$(BinariesBuildTypeArchDirectory)\RSLib_Network\RSLib_Network.lib" "$(BinariesBuildTypeArchDirectory)\RSLibImpl\RSLibImpl.lib" /MACHINE:$(Platform) /NOLOGO /LIBPATH:$(BinariesBuildTypeArchDirectory)</Command>
       <Outputs>$(Out)$(TargetName)$(TargetName)$(TargetExt);%(Outputs)</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>

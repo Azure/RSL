@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <PropertyGroup>
+    <!-- If no override is provided, fall back on the AssemblyName (C#). -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' == ''">$(AssemblyName)\</OutDirSuffix>
+    <!-- If still not defined, fall back on TargetName (native). -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' ==''">$(TargetName)\</OutDirSuffix>
+    <!-- If still not defined, just use the name of the file -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' == ''">$(MSBuildProjectName)</OutDirSuffix>
+    <BinariesBuildTypeArchDirectory>$(OUTPUTROOT)\$(BuildType)-$(BuildArchitecture)</BinariesBuildTypeArchDirectory>
+    <OutDir>$(BinariesBuildTypeArchDirectory)\$(OutDirSuffix)</OutDir>
+    <OutputPath>$(OutDir)</OutputPath>
+    <TargetPath>$(OutDir)$(TargetName)$(TargetExt)</TargetPath>
+  </PropertyGroup>
+</Project>

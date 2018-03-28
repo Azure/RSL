@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <UsingTask TaskName="SimpleRobocopy" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
+    <ParameterGroup>
+      <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Using Namespace="Microsoft.Build.Framework" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        foreach (var source in Sources)
+        {
+            var item = source.ItemSpec;
+            var dest = source.GetMetadata("DestinationFolder");
+            var isRecursive = source.GetMetadata("IsRecursive");
+            var noSymbols = source.GetMetadata("NoSymbols");
+            var dirExclude = source.GetMetadata("DirExclude");
+
+            var copySymbol = string.IsNullOrEmpty(noSymbols) || noSymbols == "true";
+            Func<string, bool> shouldCopy = filePath => {
+                var dir = Path.GetDirectoryName(filePath);
+                var name = Path.GetFileName(filePath);
+                var ext = Path.GetExtension(filePath).ToUpperInvariant();
+                if (!copySymbol && ext == ".PDB")
+                    return false;
+
+                if (!string.IsNullOrEmpty(dirExclude) && Regex.IsMatch(dir, dirExclude, RegexOptions.IgnoreCase))
+                    return false;
+
+                return true;
+            };
+
+            Log.LogMessage(MessageImportance.High, "Robocopy: {0} -> {1} recursive: '{2}'", item, dest, isRecursive);
+            if (!Directory.Exists(dest)) {
+                Directory.CreateDirectory(dest);
+            }
+
+            if (!string.IsNullOrEmpty(isRecursive) &&
+                string.Equals(isRecursive, "true", StringComparison.OrdinalIgnoreCase) &&
+                Directory.Exists(item)) {
+                var files = Directory.EnumerateFiles(item, "*.*", SearchOption.AllDirectories);
+                foreach (var f in files) {
+                    if (!File.Exists(f)) // skip directories
+                        continue;
+
+                    var fName = f.Substring(item.Length + 1);
+                    var dName = Path.Combine(dest, fName);
+                    var destDir = Path.GetDirectoryName(dName);
+                    if (!Directory.Exists(destDir))
+                        Directory.CreateDirectory(destDir);
+                    Log.LogMessage("Copy {0} -> {1}", f, dName);
+                    File.Copy(f, dName, true);
+                }
+            }
+            else {
+                var destFile = Path.Combine(dest, Path.GetFileName(item));
+                Log.LogMessage("Copy {0} -> {1}", item, destFile);
+                File.Copy(item, destFile, true);
+            }
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="RobocopyFiles" AfterTargets="_PostBuild" Condition="'@(Robocopy)' != ''">
+    <SimpleRobocopy Sources="@(Robocopy)" Condition="'@(Robocopy)' != ''" />
+  </Target>
+  <Target Name="Build" />
+  <Target Name="_PostBuild" AfterTargets="Build" />
+</Project>

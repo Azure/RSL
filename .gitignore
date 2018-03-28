@@ -23,6 +23,11 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+objd/
+obj/
+ossbuild/packageList.props
+/out/
+.*.swp
 
 # Visual Studio 2015 cache/options directory
 .vs/

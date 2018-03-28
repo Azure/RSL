@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <!-- If no override is provided, fall back on the AssemblyName (C#). -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' == ''">$(AssemblyName)\</OutDirSuffix>
+    <!-- If still not defined, fall back on TargetName (native). -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' ==''">$(TargetName)\</OutDirSuffix>
+    <!-- If still not defined, just use the name of the file -->
+    <OutDirSuffix Condition="'$(OutDirSuffix)' == ''">$(MSBuildProjectName)</OutDirSuffix>
+    <BinariesBuildTypeArchDirectory>$(OUTPUTROOT)\$(BuildType)-$(BuildArchitecture)</BinariesBuildTypeArchDirectory>
+    <OutDir>$(BinariesBuildTypeArchDirectory)\$(OutDirSuffix)</OutDir>
+    <OutputPath>$(OutDir)</OutputPath>
+  </PropertyGroup>
+
+  <Target Name="BeforeAllTargets" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <AssemblyAttributes Include="AssemblyCompany"><_Parameter1>$(AssemblyCompany)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyCopyright"><_Parameter1>$(AssemblyCopyright)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyDescription"><_Parameter1>$(GitRepositoryName) $(GitBranchName) commit $(VersionCommitHash) on $(BuildDate)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyFileVersion"><_Parameter1>$(BUILDNUMBER)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyInformationalVersion"><_Parameter1>$(AssemblyInformationalVersion)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyProduct"><_Parameter1>$(AssemblyProduct)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyTitle"><_Parameter1>$(AssemblyName)</_Parameter1></AssemblyAttributes>
+      <AssemblyAttributes Include="AssemblyVersion"><_Parameter1>$(BUILDNUMBER)</_Parameter1></AssemblyAttributes>
+
+      <!-- Standard WriteCodeFragment doesn't support boolean. So we have to work around it. -->
+      <codegenlines Include="[assembly: System.Runtime.InteropServices.ComVisible(false)]" />
+      <codegenlines Include="[assembly: System.CLSCompliant($(AssemblyCLSCompliant))]" />
+    </ItemGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <WriteCodeFragment AssemblyAttributes="@(AssemblyAttributes)"
+      Language="C#"
+      OutputFile="_asmcodegen.cs"
+      OutputDirectory="$(IntermediateOutputPath)">
+      <Output TaskParameter="OutputFile" ItemName="Compile" />
+    </WriteCodeFragment>
+    <WriteLinesToFile File="$(IntermediateOutputPath)_asmcodegen.cs" Overwrite="false" Lines="@(codegenlines)" />
+  </Target>
+</Project>

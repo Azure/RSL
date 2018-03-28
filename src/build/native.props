@@ -6,7 +6,6 @@
   <Import Project="$(ExtendedTargetsPath)\Microsoft.Cpp.Default.props" />
   
   <PropertyGroup>
-    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <TrackFileAccess>false</TrackFileAccess>
 
     <!--
@@ -63,6 +62,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <WarningLevel>Level4</WarningLevel>
+      <DisableSpecificWarnings>4091</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32_LEAN_AND_MEAN;</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>

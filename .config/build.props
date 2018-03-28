@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+***********************************************************************************************
+Environment.props
+
+This file overrides shipped msbuild settings to work well in an isolated no-install drop
+
+Environment.Custom.props should be configured by the build environment administrators to
+  * Setup paths to local SDKs and Tools
+  * Add the necessary extensibility hooks for customization from consumers
+
+Build environment administrators must call Environment.{cmd|ps1} from this directory to
+setup the build environment properly.
+
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <AssemblyCompany>Microsoft Corporation</AssemblyCompany>
+    <AssemblyDescription>Microsoft Azure%ae</AssemblyDescription>
+    <AssemblyCopyright>Copyright %a9 Microsoft Corporation. All rights reserved.</AssemblyCopyright>
+  </PropertyGroup>
+
+  <!-- Auto generate NuGet packages from projects. This is temporary stopgap solution
+    to help with migrations until we can get a permanant packaging system in place. -->
+  <PropertyGroup>
+    <InstallPkgLocal Condition="'$(InstallPkgLocal)'==''">false</InstallPkgLocal>
+  </PropertyGroup>
+
+  <!-- Turning off CLS compliance warnings/errors -->
+  <PropertyGroup>
+    <AssemblyCLSCompliant>false</AssemblyCLSCompliant>
+  </PropertyGroup>
+
+  <!-- Required for using Nuproj targets since we don't check in NuGet.exe -->
+  <PropertyGroup>
+    <NuProjToolPath>$(PkgNuGet_CommandLine)\tools</NuProjToolPath>
+  </PropertyGroup>
+
+  <!-- Add in StyleCop -->
+  <PropertyGroup>
+    <StyleCopEnabled>false</StyleCopEnabled>
+    <StyleCopVersion Condition="'$(StyleCopVersion)' == ''">4.3.0.8</StyleCopVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratedHeadersDir>$(OutputRoot)\$(BuildType)-$(BuildArchitecture)\Headers</GeneratedHeadersDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutBinDir>$(OutputRoot)\$(BuildType)-$(BuildArchitecture)\Binaries</OutBinDir>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TaefRedist>$(PkgTaef_amd64)\Binaries\Release\x64\TestExecution\</TaefRedist>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(OSSBUILD)' == ''">
+      <PropertyGroup>
+        <LibCmd>$(PkgVisualCpp_Corext)\bin\x64\$(_BuildArch)\lib.exe</LibCmd>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <LibCmd>lib.exe</LibCmd>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+</Project>
