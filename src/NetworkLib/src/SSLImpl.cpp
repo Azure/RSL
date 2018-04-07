@@ -601,7 +601,7 @@ namespace RSLibImpl
                 return E_FAIL;
             }
 
-            prev_pos = prev_pos + pos + 1;
+            prev_pos = pos + 1;
         }
 
         std::string substring(thumbprintSequence.substr(prev_pos));
