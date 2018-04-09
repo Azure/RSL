@@ -520,7 +520,8 @@ namespace RSLibImpl
                     msg->append("Cert subject is acceptable: ").append(subject).append("parent's cert: ");
                 }
 
-                if (IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg))
+                hr = IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg);
+                if (SUCCEEDED(hr))
                 {
                     return S_OK;
                 }
@@ -550,7 +551,8 @@ namespace RSLibImpl
                     msg->append("Cert subject is acceptable: ").append(subject).append("parent's cert: ");
                 }
 
-                if (IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg))
+                hr = IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg);
+                if (SUCCEEDED(hr))
                 {
                     return S_OK;
                 }
