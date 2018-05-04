@@ -51,6 +51,8 @@ namespace RSLibImpl
         char   m_workingDir[MAX_PATH+1];
         bool m_addMemberIdToWorkingDir;
         bool m_cancelDiskIo;
+
+        bool m_useGlobalAcceptMessagesFlag;
     };
     
     class RSLConfig
@@ -101,6 +103,8 @@ namespace RSLibImpl
         bool AddMemberIdToWorkingDir();
         void ChangeElectionDelay(Int64 delayInSecs);
         bool CancelDiskIo();
+
+        bool UseGlobalAcceptMessagesFlag();
 
         CRITSEC m_lock;
         ConfigParam *m_cfg;

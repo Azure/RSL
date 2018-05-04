@@ -952,6 +952,12 @@ RSLStateMachine::Resume()
     m_legislator->Resume();
 }
 
+void
+RSLStateMachine::SetAcceptMessages(bool acceptMessages)
+{
+    return m_legislator->SetAcceptMessages(acceptMessages);
+}
+
 //////////////////////
 // MemberSet
 //////////////////////
@@ -1371,6 +1377,7 @@ RSLConfigParam::RSLConfigParam()
     m_workingDir[0] = '\0';
     m_addMemberIdToWorkingDir = true;
     m_cancelDiskIo = true;
+    m_useGlobalAcceptMessagesFlag = false;
 };
 
 RSLNodeCollection::RSLNodeCollection() :

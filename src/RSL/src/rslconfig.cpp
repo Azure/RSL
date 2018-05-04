@@ -124,6 +124,7 @@ ConfigParam::Init(RSLConfigParam *param)
     }
 
     m_cancelDiskIo = param->m_cancelDiskIo;
+    m_useGlobalAcceptMessagesFlag = param->m_useGlobalAcceptMessagesFlag;
 
     return true;
 }
@@ -395,3 +396,9 @@ RSLConfig::CancelDiskIo()
     return m_cfg->m_cancelDiskIo;
 }
 
+bool
+RSLConfig::UseGlobalAcceptMessagesFlag()
+{
+    AutoCriticalSection lock(&m_lock);
+    return m_cfg->m_useGlobalAcceptMessagesFlag;
+}

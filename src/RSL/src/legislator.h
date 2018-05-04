@@ -577,6 +577,8 @@ namespace RSLibImpl
         void RelinquishPrimary();
         bool IsInStableState();
 
+        void SetAcceptMessages(bool acceptMessages);
+
     private:
 
         static Message *UnMarshalMessage(IMarshalMemoryManager *memory);
@@ -869,6 +871,8 @@ namespace RSLibImpl
         CRITSEC m_statsLock;
 
         friend class ExecuteQueue;
+
+        bool m_acceptMessages;
     };
 
     class LegislatorArgWrapper

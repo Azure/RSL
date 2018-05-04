@@ -1,3 +1,14 @@
+## version 1.2.29.0: GlobalAcceptMessagesFlag feature
+
+By default in RSL the thread which participates in message correspondence and vote acceptance will call AcceptMessageFromReplica in the state machine implementation for every vote and prepare message. One side-effect of this is that when using managed state machine implementations this can cause the vote acceptance thread to become blocked due to garbage collection.
+
+This version adds a GlobalAcceptMessagesFlag feature which allows a state machine to decide whether or not to accept votes based on a global flag (settable by the state machine) instead of calling into AcceptMessageFromReplica. When using this feature the message correspondence/vote acceptance
+thread no longer calls into the state machine which ensures these critical RSL functions continue to work even if the state machine is blocked due to garbage collection.
+
+### How to consume it?
+
+This is an opt-in feature. When initializing RSL, the application will need to set UseGlobalAcceptMessagesFlag to true in the RSL configuration parameters. By default RSL will accept all messages. The state machine can call into SetAcceptMessages any time after initialization to enable or disable accepting of messages.
+
 ## version 1.2.0.0: VotePayload feature
 
 This change allows the secondaries to indicate a small payload (64bits) on each vote they accept. This is a very low footprint and high resolution channel from secondaries to the primary that allows the application at the secondaries to communicate the application at the primary aside with their health.
