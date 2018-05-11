@@ -1293,6 +1293,11 @@ ManagedRSLStats^ ManagedRSLStateMachine::GetStatisticsSnapshot()
     return result;
 }
 
+void ManagedRSLStateMachine::SetAcceptMessages(bool acceptMessages)
+{
+    m_oMRSLMachine->SetAcceptMessages(acceptMessages);
+}
+
 System::UInt64 ManagedRSLUtils::CalculateChecksum(array<System::Byte>^ data)
 {
     unsigned char* blob = new unsigned char[data->Length];

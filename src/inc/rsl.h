@@ -496,6 +496,9 @@ namespace RSLib
 
         // Call CancelIoEx to attempt to cancel unwanted disk IO before waiting for its completion.
         bool m_cancelDiskIo;
+
+        // Use global accept messages flag set by SetAcceptMessages rather than calling AcceptMessageFromReplica 
+        bool m_useGlobalAcceptMessagesFlag;
     };
 
     // Filled in by GetStatisticsSnapshot. Returns incremental statistics
@@ -1051,6 +1054,8 @@ namespace RSLib
         * m_cbSizeOfThisStruct (used as a versioning mechanism by the method).
         */
         void GetStatisticsSnapshot(RSLStats * pStats);
+
+        void SetAcceptMessages(bool acceptMessages);
 
         /* These methods are defined only for testing purpose */
         void Pause();

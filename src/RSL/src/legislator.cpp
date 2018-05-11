@@ -1112,7 +1112,8 @@ Legislator::Legislator( bool IndependentHeartbeat ) :
     m_frPaused(MainThread_Run), m_frPausedCount(0),
     m_paused(MainThread_Run), m_version(RSLProtocolVersion_1), m_hbPaused(MainThread_Run),
     m_serializeFastReadsWithReplicate(true), m_highestDefunctConfigurationNumber(0), m_IndependentHeartbeat( IndependentHeartbeat ),
-    m_relinquishPrimary(false), m_forceReelection(false), m_pFetchSocket(StreamSocket::CreateStreamSocket()), m_votePayload(0)
+    m_relinquishPrimary(false), m_forceReelection(false), m_pFetchSocket(StreamSocket::CreateStreamSocket()), m_votePayload(0),
+    m_acceptMessages(true)
 {
     m_primaryCookie = new PrimaryCookie();
     m_waitHandle = CreateEvent(NULL, false, true, NULL);
@@ -2896,11 +2897,22 @@ Legislator::HandleNewVotes(VoteQueue &localQueue)
                 }
                 else
                 {
-                    sendResponse = m_stateMachine->AcceptMessageFromReplica(
-                        &m_maxAcceptedVote->m_replica->m_node,
-                        m_maxAcceptedVote->m_primaryCookie.m_data,
-                        m_maxAcceptedVote->m_primaryCookie.m_len);
+                    // GlobalAcceptMessagesFlag feature is opt-in feature to avoid querying state machine
+                    // for every vote as calling state machine here can cause MainLoop to get blocked if 
+                    // state machine is managed implementation and performing garbage collection
+                    if (m_cfg.UseGlobalAcceptMessagesFlag())
+                    {
+                        sendResponse = this->m_acceptMessages;
+                    }
+                    else
+                    {
+                        sendResponse = m_stateMachine->AcceptMessageFromReplica(
+                            &m_maxAcceptedVote->m_replica->m_node,
+                            m_maxAcceptedVote->m_primaryCookie.m_data,
+                            m_maxAcceptedVote->m_primaryCookie.m_len);
+                    } 
                 }
+
                 if (sendResponse)
                 {
                     Message msg(m_version,
@@ -3147,9 +3159,24 @@ Legislator::HandlePrepareMsg(PrepareMsg *msg)
         // don't hold a lock while calling upper layer (in m_stateMachine)
         hbLock.Leave();
 
-        if (m_stateMachine->AcceptMessageFromReplica(&msg->m_replica->m_node,
-                                                     msg->m_primaryCookie.m_data,
-                                                     msg->m_primaryCookie.m_len))
+        bool acceptPrepare;
+
+        // GlobalAcceptMessagesFlag feature is opt-in feature to avoid querying state machine
+        // for every vote as calling state machine here can cause MainLoop to get blocked if 
+        // state machine is managed implementation and performing garbage collection
+        if (m_cfg.UseGlobalAcceptMessagesFlag())
+        {
+            acceptPrepare = this->m_acceptMessages;
+        }
+        else
+        {
+            acceptPrepare = m_stateMachine->AcceptMessageFromReplica(
+                &msg->m_replica->m_node,
+                msg->m_primaryCookie.m_data,
+                msg->m_primaryCookie.m_len);
+        } 
+
+        if (acceptPrepare)
         {
             PrepareAccepted resp(m_version,
                                  m_memberId,
@@ -7438,6 +7465,12 @@ Legislator::ThreadStartMethodCustomized(void *arg)
     delete wrapper;
 
     return 0;
+}
+
+void
+Legislator::SetAcceptMessages(bool acceptMessages)
+{
+    this->m_acceptMessages = acceptMessages;
 }
 
 LegislatorNetHandler::LegislatorNetHandler(Legislator *legislator, bool asClient) :

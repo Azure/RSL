@@ -308,6 +308,11 @@ namespace ManagedRSLib
                 Marshal::FreeHGlobal(pStr);
             }
         }
+
+        property bool UseGlobalAcceptMessagesFlag {
+            bool get() { return m_configParam->m_useGlobalAcceptMessagesFlag; }
+            void set(bool value) { m_configParam->m_useGlobalAcceptMessagesFlag = value; }
+        }
     };
 
     public ref class ManagedReplicaHealth
@@ -873,6 +878,8 @@ namespace ManagedRSLib
         }
 
         ManagedRSLStats^ GetStatisticsSnapshot();
+
+        void SetAcceptMessages(bool acceptMessages);
 
         private:
 
