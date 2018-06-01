@@ -1203,7 +1203,7 @@ TestEngine::HandleFetchRequest(void * /*arg*/)
     {
         std::unique_ptr<StreamSocket> pSock(StreamSocket::CreateStreamSocket());
         UT_AssertIsNotNull(pSock.get());
-        int ec = m_pFetchSocket->Accept(pSock.get());
+        int ec = m_pFetchSocket->Accept(pSock.get(), m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
         if (ec != NO_ERROR)
         {
             UT_AssertAreEqual(NO_ERROR, ec);
@@ -1255,8 +1255,7 @@ TestEngine::Fetch(Message *msg, const char *file)
     msg->Marshal(&marshal);
     
 	std::unique_ptr<StreamSocket> pSock(StreamSocket::CreateStreamSocket());
-    UT_AssertAreEqual(NO_ERROR, pSock->Connect(m_testingNode.m_ip, m_testingNode.m_rslPort+1));
-    pSock->SetTimeouts(m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
+    UT_AssertAreEqual(NO_ERROR, pSock->Connect(m_testingNode.m_ip, m_testingNode.m_rslPort+1, m_cfg.ReceiveTimeout(), m_cfg.SendTimeout()));
     
     UT_AssertAreEqual(NO_ERROR, pSock->Write(marshal.GetMarshaled(), marshal.GetMarshaledLength()));
 

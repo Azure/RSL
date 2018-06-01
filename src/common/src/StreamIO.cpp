@@ -20,14 +20,16 @@ StreamSocket::~StreamSocket()
 }
 
 DWORD32
-StreamSocket::SetTimeouts(int recv, int send)
+StreamSocket::SetTimeouts(DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     LogAssert(m_sock != INVALID_SOCKET);
-    if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&recv, sizeof(int)) != 0 ||
-        setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&send, sizeof(int)) != 0)
+
+    if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&recvTimeoutMs, sizeof(DWORD)) != 0 ||
+        setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&sendTimeoutMs, sizeof(DWORD)) != 0)
     {
-        return GetLastError();
+        return WSAGetLastError();
     }
+
     return NO_ERROR;
 }
 
@@ -58,7 +60,7 @@ SslSocket::~SslSocket()
 }
 
 DWORD32 
-SslSocket::Accept(StreamSocket *socket)
+SslSocket::Accept(StreamSocket *socket, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     SslSocket *pSslSocket = dynamic_cast<SslSocket*>(socket);
     if (NULL == pSslSocket)
@@ -66,7 +68,7 @@ SslSocket::Accept(StreamSocket *socket)
         return ERROR_INVALID_PARAMETER;
     }
 
-    DWORD32 status = StreamSocket::Accept(socket);
+    DWORD32 status = StreamSocket::Accept(socket, recvTimeoutMs, sendTimeoutMs);
     if (NO_ERROR == status)
     {
         pSslSocket->m_sslsocket = new SslPlumbing::SChannelSocket(socket->m_sock, NULL, true /* isServer */);
@@ -82,8 +84,14 @@ SslSocket::Accept(StreamSocket *socket)
 }
 
 DWORD32
-SslSocket::Connect(SOCKET sock)
+SslSocket::Connect(SOCKET sock, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
+    if (setsockopt(m_sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&recvTimeoutMs, sizeof(DWORD)) != 0 ||
+        setsockopt(m_sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&sendTimeoutMs, sizeof(DWORD)) != 0)
+    {
+        return WSAGetLastError();
+    }
+
     m_sslsocket = new SslPlumbing::SChannelSocket(sock, NULL, false /* isServer */);
     
     DWORD32 status = m_sslsocket->Connect();
@@ -97,7 +105,7 @@ SslSocket::Connect(SOCKET sock)
 }
 
 DWORD32 
-SslSocket::Connect(UInt32 ip, UInt16 port)
+SslSocket::Connect(UInt32 ip, UInt16 port, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     DWORD32 ret = InitInternalSock(ip, port);
     if (ret != NO_ERROR)
@@ -110,11 +118,11 @@ SslSocket::Connect(UInt32 ip, UInt16 port)
         return WSAGetLastError();
     }
 
-    return Connect(m_sock);
+    return Connect(m_sock, recvTimeoutMs, sendTimeoutMs);
 }
 
 DWORD32 
-SslSocket::Connect(const char *pszMachineName, const char *pszPort)
+SslSocket::Connect(const char *pszMachineName, const char *pszPort, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     DWORD32 ret = InitInternalSock(NULL, NULL); //ip and port info comes from getaddrinfo downstairs
     if (ret != NO_ERROR)
@@ -150,7 +158,7 @@ SslSocket::Connect(const char *pszMachineName, const char *pszPort)
         return WSAGetLastError();
     }
     
-    return Connect(m_sock);
+    return Connect(m_sock, recvTimeoutMs, sendTimeoutMs);
 }
 
 int
@@ -220,7 +228,7 @@ StreamSocket::InitInternalSock(UInt32 ip, UInt16 port)
 }
 
 DWORD32
-StreamSocket::Connect(const char *pszMachineName, const char* pszPort)
+StreamSocket::Connect(const char *pszMachineName, const char* pszPort, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     DWORD32 ret = InitInternalSock(NULL, NULL); //ip and port info comes from getaddrinfo downstairs
     if (ret != NO_ERROR)
@@ -257,11 +265,18 @@ StreamSocket::Connect(const char *pszMachineName, const char* pszPort)
     }
 
     freeaddrinfo(pRetVal);
+
+    ret = SetTimeouts(recvTimeoutMs, sendTimeoutMs);
+    if (ret != NO_ERROR)
+    {
+        return ret;
+    }
+    
     return NO_ERROR;
 }
 
 DWORD32
-StreamSocket::Connect(UInt32 ip, UInt16 port)
+StreamSocket::Connect(UInt32 ip, UInt16 port, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     DWORD32 ret = InitInternalSock(ip, port);
     if (ret != NO_ERROR)
@@ -272,6 +287,12 @@ StreamSocket::Connect(UInt32 ip, UInt16 port)
     if (connect(m_sock, (sockaddr *)&m_addr, sizeof(m_addr)) == SOCKET_ERROR)
     {
         return WSAGetLastError();
+    }
+
+    ret = SetTimeouts(recvTimeoutMs, sendTimeoutMs);
+    if (ret != NO_ERROR)
+    {
+        return ret;
     }
 
     return NO_ERROR;
@@ -334,7 +355,7 @@ StreamSocket::Cancel()
 }
 
 DWORD32
-StreamSocket::Accept(StreamSocket *socket)
+StreamSocket::Accept(StreamSocket *socket, DWORD recvTimeoutMs, DWORD sendTimeoutMs)
 {
     LogAssert(m_sock != INVALID_SOCKET);
     SOCKET s;
@@ -349,6 +370,14 @@ StreamSocket::Accept(StreamSocket *socket)
     }
 
     socket->m_sock = s;
+
+    DWORD32 ret = socket->SetTimeouts(recvTimeoutMs, sendTimeoutMs);
+    if (ret != NO_ERROR)
+    {
+        Log(LogID_Common, LogLevel_Error, "Failed to set socket timeouts after accept", LogTag_LastError, ret, LogTag_End);
+        return ret;
+    }
+
     return NO_ERROR;
 }
    
@@ -465,120 +494,5 @@ StreamSocket::SetFastClose(bool on)
     {
         return (WSAGetLastError());
     }
-    return NO_ERROR;
-}
-
-//*******************************************************
-//StreamFile
-//*******************************************************
-
-StreamFile::StreamFile()
-{
-    m_fIncoming = NULL;
-    m_fOutgoing = NULL;
-}
-
-StreamFile::~StreamFile()
-{
-    Disconnect();
-}
-
-//close all the files
-bool
-StreamFile::Disconnect()
-{
-
-    if (m_fIncoming)
-    {
-        fclose(m_fIncoming);
-    }
-
-    if (m_fOutgoing)
-    {
-        fclose(m_fOutgoing);
-    }
-
-    return (!(m_fIncoming || m_fOutgoing));
-}
-
-DWORD32
-//required for inheritence reasons, no practical use for streamfile
-StreamFile::SetTimeouts(int /*recv*/, int /*send*/)
-{
-    return NO_ERROR;
-}
-  
-DWORD32
-StreamFile::Connect(const char *pszFileName, const char* /*pszNotUsed*/)
-{
-    string outFile = pszFileName;
-    outFile.append(".out");
-    string inFile = pszFileName;
-    inFile.append(".in");
-
-    if (!this->Disconnect())
-    {
-        return WSASYSCALLFAILURE;
-    }
-
-    m_fIncoming = fopen(inFile.c_str(), "rb");
-    m_fOutgoing = fopen(outFile.c_str(), "wb");
-
-    if (!m_fIncoming || !m_fOutgoing)
-    {
-        return WSASYSCALLFAILURE;
-    }
-
-    return NO_ERROR;
-}
-
-DWORD32
-StreamFile::Connect(UInt32 fileNumber, UInt16 /*notUsed*/)
-{
-    char filename[65];
-    _ui64toa_s( fileNumber, filename, ARRAYSIZE(filename), 10);
-
-    return this->Connect(filename, NULL);
-}
-    
-DWORD32
-StreamFile::Write(const void *buffer, UInt32 numBytes, UInt32 *bytesSent)
-{
-    *bytesSent = (UInt32)fwrite(buffer, sizeof(char), (size_t)numBytes, m_fOutgoing);
-    if (*bytesSent != numBytes)
-    {
-        return WSASYSCALLFAILURE;
-    }
-
-    return NO_ERROR;
-}
-
-DWORD32
-StreamFile::Write(const void *buffer, UInt32 numBytes)
-{
-    UInt32 written;
-    return Write(buffer, numBytes, &written);
-}
-
-DWORD32
-StreamFile::Read(void *buffer, UInt32 numBytes, UInt32 *received)
-{
-    return Read(buffer, numBytes, received, true);
-}
-
-DWORD32
-StreamFile::Read(void *buffer, UInt32 numBytes, UInt32 *received, bool /*bShouldReceiveAll*/)
-{
-    *received = (UInt32)fread(buffer, sizeof(char), (size_t)numBytes, m_fIncoming);
-    if (ferror(m_fIncoming))
-    {
-        return WSASYSCALLFAILURE;
-    }
-
-    if (feof(m_fIncoming))
-    {
-        return ERROR_HANDLE_EOF;
-    }
-
     return NO_ERROR;
 }
