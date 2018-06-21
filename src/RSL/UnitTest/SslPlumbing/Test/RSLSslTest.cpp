@@ -1,16 +1,16 @@
 #include <rsl.h>
+#include <ctime>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <strsafe.h>
-#include "sslplumbing.h"
+#include "streamio.h"
 
 #include "basic_types.h"
 
 #include "Wincrypt.h"
 
 using namespace SslPlumbing;
-
 
 int GetName(const char *name, in_addr * add)
 {
@@ -40,14 +40,14 @@ void GetAddress(const char *str, in_addr *addr)
     *p = inet_addr(str);
 }
 
-int Client(const char * serverAddress, u_short aPortNumber, void(*clientFunction)(SChannelSocket* sck))
+SOCKET ConnectClient(const char* serverAddress, u_short aPortNumber)
 {
     SOCKET sockfd = socket(PF_INET, SOCK_STREAM, 0);
     if (sockfd == SOCKET_ERROR)
     {
         perror("ERROR creating socket");
         //Log and Error
-        return 1;
+        return NULL;
     }
 
     struct sockaddr_in saiServerAddress;
@@ -66,24 +66,44 @@ int Client(const char * serverAddress, u_short aPortNumber, void(*clientFunction
     {
         perror("ERROR connecting to socket");
         closesocket(sockfd);
+        return NULL;
+    }
+
+    printf("Socket connect succeeded\n");
+
+    return sockfd;
+}
+
+int Client(const char * serverAddress, u_short aPortNumber, const char * certThumbprint, void(*clientFunction)(SChannelSocket* sck))
+{
+    SOCKET sockfd = ConnectClient(serverAddress, aPortNumber);
+
+    if(sockfd == NULL)
+    {
         return 1;
     }
 
-    SSLAuth::SetSSLThumbprints("MY", "ff4b8dc4dd64c15293ec810975fc91ebd00dc06f", "f0ba8e6e05042b7b0cc8875257a1d8119213353c", true, true);
+    SSLAuth::SetSSLThumbprints("MY", certThumbprint, certThumbprint, true, true);
     std::unique_ptr<SChannelSocket> sslsock(new SChannelSocket(sockfd, NULL, false));
 
-    if (sslsock->Connect())
+    int ret = sslsock->Connect();
+    if (ret == NO_ERROR)
     {
-        printf("Connected\n");
+        printf("SSL auth completed\n");
         clientFunction(sslsock.get());
 
         sslsock->Close();
+    }
+    else
+    {
+        printf("SSL auth failed: %d\n", ret);
+        return 1;
     }
 
     return 0;
 }
 
-int Listener(const char * bindAddr, u_short aPortNumber, void(*clientFunction)(SChannelSocket* sck))
+SOCKET ListenForAndAcceptClient(const char* bindAddr, u_short aPortNumber)
 {
     SOCKET sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
@@ -92,7 +112,7 @@ int Listener(const char * bindAddr, u_short aPortNumber, void(*clientFunction)(S
         int  err = WSAGetLastError();
         printf("error: %d\n", err);
         perror("ERROR opening socket");
-        return 1;
+        return NULL;
     }
 
     sockaddr_in saiServerAddress;
@@ -111,7 +131,7 @@ int Listener(const char * bindAddr, u_short aPortNumber, void(*clientFunction)(S
         printf("error: %d\n", err);
         perror("ERROR binding socket");
         closesocket(sockfd);
-        return 1;
+        return NULL;
     }
     listen(sockfd, 10);
 
@@ -125,23 +145,183 @@ int Listener(const char * bindAddr, u_short aPortNumber, void(*clientFunction)(S
         printf("error: %d\n", err);
         perror("ERROR accepting socket");
         closesocket(sockfd);
+        return NULL;
+    }
+
+    printf("TCP client accept successful\n");
+
+    return newsockfd;
+}
+
+int Listener(const char* bindAddr, u_short aPortNumber, const char* certThumbprint, void(*clientFunction)(SChannelSocket* sck))
+{
+    SOCKET newsockfd = ListenForAndAcceptClient(bindAddr, aPortNumber);
+    
+    if(newsockfd == NULL)
+    {
         return 1;
     }
 
-    SSLAuth::SetSSLThumbprints("MY", "f0ba8e6e05042b7b0cc8875257a1d8119213353c", "ff4b8dc4dd64c15293ec810975fc91ebd00dc06f", true, true);
+    SSLAuth::SetSSLThumbprints("MY", certThumbprint, certThumbprint, true, true);
     std::unique_ptr<SChannelSocket> sslsock(new SChannelSocket(newsockfd, "contoso", true));
 
-    if (sslsock->Accept())
+    int ret = sslsock->Accept();
+    if (ret == NO_ERROR)
     {
-        printf("Accepted\n");
+        printf("SSL auth succeeded\n");
         clientFunction(sslsock.get());
 
         sslsock->Close();
     }
+    else
+    {
+        printf("SSL auth failed: %d\n", ret);
+        return 1;
+    }
+
     return 0;
 }
 
+struct SocketTestParam
+{
+    const char* bindAddr;
+    const char* sPortNumber;
+    u_short aPortNumber;
+};
 
+DWORD __stdcall ListenAndAcceptClientThreadMain(LPVOID param)
+{
+    SocketTestParam* p = (SocketTestParam*)param;
+
+    ListenForAndAcceptClient(p->bindAddr, p->aPortNumber);
+
+    return 0;
+}
+
+DWORD __stdcall ConnectClientThreadMain(LPVOID param)
+{
+    SocketTestParam* p = (SocketTestParam*)param;
+
+    ConnectClient(p->bindAddr, p->aPortNumber);
+
+    return 0;
+}
+
+DWORD __stdcall StreamSocketClientThreadMain(LPVOID param)
+{
+    SocketTestParam* p = (SocketTestParam*)param;
+
+    StreamSocket* clientSocket = StreamSocket::CreateStreamSocket();
+    clientSocket->Connect(p->bindAddr, p->sPortNumber, 5000, 5000);
+
+    return 0;
+}
+
+int StreamSocketClientTimeoutTest(const char* bindAddr, const char* portNumber, const char* certThumbprint)
+{
+    SocketTestParam SocketTestParam;
+    SocketTestParam.bindAddr = bindAddr;
+    SocketTestParam.sPortNumber = portNumber;
+    SocketTestParam.aPortNumber = (u_short)atoi(portNumber);
+
+    SSLAuth::SetSSLThumbprints("MY", certThumbprint, certThumbprint, true, true);
+
+    // spawn misbehaving server which accepts TCP client but doesn't complete auth
+    HANDLE threadHandle = CreateThread(NULL, 0, ListenAndAcceptClientThreadMain, (LPVOID)&SocketTestParam, 0, NULL);
+    if (threadHandle == NULL)
+    {
+        printf("ListenAndAcceptClient thread create failed %d\n", GetLastError());
+        return 1;
+    }
+
+    StreamSocket* streamSocket = StreamSocket::CreateStreamSocket();
+
+    std::clock_t connectStart = std::clock();
+
+    printf("Testing that SSL auth timeouts from client if server does not respond\n");
+
+    int ret = streamSocket->Connect(bindAddr, portNumber, 5000, 5000);
+
+    double connectTime = (std::clock() - connectStart) / (double)CLOCKS_PER_SEC;
+
+    printf("Connect result: %d time: %f seconds", ret, connectTime);
+
+    WaitForSingleObject(threadHandle, INFINITE);
+
+    if(ret != WSAETIMEDOUT)
+    {
+        perror("Did not receive timeout error as expected");
+        return 1;
+    }
+
+    return 0;
+}
+
+int StreamSocketServerAcceptTimeoutTest(const char* bindAddr, const char* portNumber, const char* certThumbprint)
+{
+    SocketTestParam socketTestParam;
+    socketTestParam.bindAddr = bindAddr;
+    socketTestParam.aPortNumber = (u_short)atoi(portNumber);
+    socketTestParam.sPortNumber = portNumber;
+
+    SSLAuth::SetSSLThumbprints("MY", certThumbprint, certThumbprint, true, true);
+
+    StreamSocket* listenSocket = StreamSocket::CreateStreamSocket();
+    int ret = listenSocket->BindAndListen(socketTestParam.aPortNumber, 1024, 120, 1);
+
+    if (ret != NO_ERROR)
+    {
+        printf("Unable to bind socket for listening: %d\n", ret);
+        return 1;
+    }
+
+    // spawn misbehaving client which doesn't complete auth
+    HANDLE threadHandle = CreateThread(NULL, 0, ConnectClientThreadMain, (LPVOID)&socketTestParam, 0, NULL);
+    if (threadHandle == NULL)
+    {
+        printf("ConnectClient thread create failed %d\n", GetLastError());
+        return 1;
+    }
+
+    StreamSocket* clientSocket = StreamSocket::CreateStreamSocket();
+    std::clock_t connectStart = std::clock();
+
+    ret = listenSocket->Accept(clientSocket, 5000, 5000);
+
+    double acceptTime = (std::clock() - connectStart) / (double)CLOCKS_PER_SEC;
+
+    printf("Accept result: %d time: %f seconds", ret, acceptTime);
+
+    if(ret != WSAETIMEDOUT)
+    {
+        perror("Did not receive timeout error as expected");
+        return 1;
+    }
+
+    WaitForSingleObject(threadHandle, INFINITE);
+    
+    // make sure we can accept legitimate clients now still
+    threadHandle = CreateThread(NULL, 0, StreamSocketClientThreadMain, (LPVOID)&socketTestParam, 0, NULL);
+    if (threadHandle == NULL)
+    {
+        printf("StreamSocketClient thread create failed %d\n", GetLastError());
+        return 1;
+    }
+
+    ret = listenSocket->Accept(clientSocket, 5000, 5000);
+    if(ret != NO_ERROR)
+    {
+        perror("Unable to accept legitimate client");
+        printf("Accept of legimate client failed. %d\n", ret);
+        return 1;
+    }
+
+    printf("Successfully accepted new client\n");
+
+    WaitForSingleObject(threadHandle, INFINITE);
+
+    return 0;
+}
 
 void WriteSomething(SChannelSocket *sck, char *str)
 {
@@ -356,6 +536,14 @@ void ServerOperation(SChannelSocket *sck)
     WaitForMultipleObjects(2, threadHandles, TRUE, INFINITE);
 }
 
+void PrintUsage()
+{
+    printf("Client Usage: rslssltest c ServerAddress ServerPort CertThumbprint\n");
+    printf("Server Usage: rslssltest s ServerPort CertThumbprint\n");
+    printf("Server Usage: rslssltest clienttimeouttest ServerPort CertThumbprint\n");
+    printf("Server Usage: rslssltest servertimeouttest ServerPort CertThumbprint\n");
+}
+
 int main(int argc, char* argv[])
 {
     WORD wVersionRequested;
@@ -376,24 +564,54 @@ int main(int argc, char* argv[])
 
     if (argc < 2)
     {
-        return 0;
+        PrintUsage();
+        return 1;
     }
     if (strcmp(argv[1], "c") == 0)
     {
-        if (argc < 3)
+        if (argc < 5)
         {
-            return 0;
+            PrintUsage();
+            return 1;
         }
-        Client(argv[2], (u_short)atoi(argv[3]), ClientOperation);
+
+        return Client(argv[2], (u_short)atoi(argv[3]), argv[4], ClientOperation);
     }
     else if (strcmp(argv[1], "s") == 0)
     {
-        if (argc < 2)
+        if (argc < 4)
         {
-            return 0;
+            PrintUsage();
+            return 1;
         }
 
-        Listener("127.0.0.1", (u_short)atoi(argv[2]), ServerOperation);
+        return Listener("127.0.0.1", (u_short)atoi(argv[2]), argv[3], ServerOperation);
     }
+    else if (strcmp(argv[1], "clienttimeouttest") == 0)
+    {
+        if (argc < 4)
+        {
+            PrintUsage();
+            return 1;
+        }
+
+        return StreamSocketClientTimeoutTest("127.0.0.1", argv[2], argv[3]);
+    }
+    else if (strcmp(argv[1], "servertimeouttest") == 0)
+    {
+        if (argc < 4)
+        {
+            PrintUsage();
+            return 1;
+        }
+
+        return StreamSocketServerAcceptTimeoutTest("127.0.0.1", argv[2], argv[3]);
+    }
+    else
+    {
+        PrintUsage();
+        return 1;
+    }
+
     return 0;
 }

@@ -1,3 +1,7 @@
+## version 1.2.30.0: SSL socket send/recv timeout bug fix
+
+There was a bug in the SSL implementation where it was not having timeouts set on the socket until after SSL handshake is complete, which means if there is a misbehaving client or server which doesn't complete the handshake the other end will get blocked indefinitely. This bug has been fixed in this version.
+
 ## version 1.2.29.0: GlobalAcceptMessagesFlag feature
 
 By default in RSL the thread which participates in message correspondence and vote acceptance will call AcceptMessageFromReplica in the state machine implementation for every vote and prepare message. One side-effect of this is that when using managed state machine implementations this can cause the vote acceptance thread to become blocked due to garbage collection.

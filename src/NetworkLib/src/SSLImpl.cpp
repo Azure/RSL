@@ -520,7 +520,8 @@ namespace RSLibImpl
                     msg->append("Cert subject is acceptable: ").append(subject).append("parent's cert: ");
                 }
 
-                if (IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg))
+                hr = IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg);
+                if (SUCCEEDED(hr))
                 {
                     return S_OK;
                 }
@@ -550,7 +551,8 @@ namespace RSLibImpl
                     msg->append("Cert subject is acceptable: ").append(subject).append("parent's cert: ");
                 }
 
-                if (IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg))
+                hr = IsCertificateThumbprintAcceptable(parentCertContext, (LPVOID*)arrayOfThumbprints, num, msg);
+                if (SUCCEEDED(hr))
                 {
                     return S_OK;
                 }
@@ -601,7 +603,7 @@ namespace RSLibImpl
                 return E_FAIL;
             }
 
-            prev_pos = prev_pos + pos + 1;
+            prev_pos = pos + 1;
         }
 
         std::string substring(thumbprintSequence.substr(prev_pos));

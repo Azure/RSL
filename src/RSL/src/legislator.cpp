@@ -1380,7 +1380,7 @@ Legislator::CopyStateThread(void *cookie)
 
         RSLInfo("Sending status request message", LogTag_RSLMemberId, memberId);
 
-        ec = pSock->Connect(ip, port);
+        ec = pSock->Connect(ip, port, m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
         if (ec != NO_ERROR)
         {
             RSLInfo("Failed to connect", LogTag_ErrorCode, ec);
@@ -3738,13 +3738,12 @@ Legislator::LearnVotes(UInt32 ip, UInt16 port)
 
     std::unique_ptr<StreamSocket> pSock(StreamSocket::CreateStreamSocket());
 
-    int ec = pSock->Connect(ip, port);
+    int ec = pSock->Connect(ip, port, m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
     if (ec != NO_ERROR)
     {
         RSLInfo("Failed to connect", LogTag_ErrorCode, ec);
         return false;
     }
-    pSock->SetTimeouts(m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
 
     ec = pSock->Write(marshal.GetMarshaled(), marshal.GetMarshaledLength());
     if (ec != NO_ERROR)
@@ -5317,7 +5316,7 @@ Legislator::FetchServerLoop()
         std::unique_ptr<StreamSocket> pSock(StreamSocket::CreateStreamSocket());
 
         LogAssert(pSock.get());
-        DWORD32 lerror = m_pFetchSocket->Accept(pSock.get());
+        DWORD32 lerror = m_pFetchSocket->Accept(pSock.get(), m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
         if (lerror != NO_ERROR)
         {
             RSLError("Accept failed", LogTag_ErrorCode, lerror);
@@ -5334,7 +5333,6 @@ Legislator::HandleFetchRequest(void *ctx)
 {
     std::unique_ptr<StreamSocket> pSocket((StreamSocket *) ctx);
 
-    pSocket->SetTimeouts(m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
     // decode the message from the client
     // Read the msghdr
     RSLInfo("Handling fetch request",
@@ -5516,13 +5514,12 @@ Legislator::CopyCheckpoint(UInt32 ip, UInt16 port, UInt64 checkpointedDecree, UI
 
     req.Marshal(&marshal);
 
-    int ec = pSock->Connect(ip, port);
+    int ec = pSock->Connect(ip, port, m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
     if (ec != NO_ERROR)
     {
         RSLInfo("Failed to connect", LogTag_ErrorCode, ec);
         goto lError;
     }
-    pSock->SetTimeouts(m_cfg.ReceiveTimeout(), m_cfg.SendTimeout());
 
     ec = pSock->Write(marshal.GetMarshaled(), marshal.GetMarshaledLength());
     if (ec != NO_ERROR)
