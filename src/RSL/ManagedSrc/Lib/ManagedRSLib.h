@@ -6,7 +6,7 @@ ManagedRSLib.h
     it encapsulates all the marshaling that is needed to interact with the
     unmanaged RSLib.
 
-    For a better reference of every class/method in this library please 
+    For a better reference of every class/method in this library please
     read rsl.h (//depot/dev/main/private/shared/rsl/rsl.h)
 */
 #pragma once
@@ -35,15 +35,15 @@ using namespace System::Net;
 using namespace System::Net::Sockets;
 using namespace System::Runtime::InteropServices;
 
-//Managed wrapper for the RSL library 
+//Managed wrapper for the RSL library
 namespace ManagedRSLib
 {
-    
+
     class RSLStateMachineWrapper;
 
-    
+
     //RSLResponse
-    public enum class RSLResponse 
+    public enum class RSLResponse
     {
         RSLFastReadStale = RSLib::RSLFastReadStale,
         RSLNotPrimary    = RSLib::RSLNotPrimary,
@@ -64,7 +64,7 @@ namespace ManagedRSLib
         System::String^ m_fileName;
 
         long long m_llPos;
-        
+
         public:
         ManagedRSLCheckpointStream(System::String^ fileName, bool reader, ManagedRSLCheckpointStream^ readerStr);
         ManagedRSLCheckpointStream(System::String^ fileName, bool reader);
@@ -102,12 +102,12 @@ namespace ManagedRSLib
         {
             bool get() override;
         }
-        
+
         virtual property  bool CanWrite
         {
             bool get() override;
         }
-        
+
         virtual property bool CanTimeout
         {
             bool get() override;
@@ -121,7 +121,7 @@ namespace ManagedRSLib
 
         virtual void WriteByte(unsigned char value) override;
 
-        virtual void Flush() override; 
+        virtual void Flush() override;
     };
 
     //RSLProtocolVersion
@@ -129,12 +129,12 @@ namespace ManagedRSLib
     {
         // First Protocol Version
         ManagedRSLProtocolVersion_1 = RSLib::RSLProtocolVersion_1,
-    
+
         // This version supports passing primary cookie as part of the
         // message. AcceptMessageFromReplica() will always be called with
         // (NULL, 0) Without this version
         ManagedRSLProtocolVersion_2 = RSLib::RSLProtocolVersion_2,
-    
+
         // This version introduces replica set management.
         // It allows replicas to be added, removed or replaced
         ManagedRSLProtocolVersion_3 = RSLib::RSLProtocolVersion_3,
@@ -144,10 +144,10 @@ namespace ManagedRSLib
         // a replica set out of a group of available replicas
         // by issuing a command from a given replica
         ManagedRSLProtocolVersion_4 = RSLib::RSLProtocolVersion_4,
-	
+
         // This version introduces relinguishPrimary flag
         ManagedRSLProtocolVersion_5 = RSLib::RSLProtocolVersion_5,
-	
+
         // This version introduces vote payload
         ManagedRSLProtocolVersion_6 = RSLib::RSLProtocolVersion_6,
     };
@@ -159,8 +159,18 @@ namespace ManagedRSLib
 
     public:
         ManagedRSLConfigParam() { m_configParam = new RSLConfigParam(); }
-        !ManagedRSLConfigParam() { delete m_configParam; m_configParam = NULL; }
-        ~ManagedRSLConfigParam() { delete m_configParam; m_configParam = NULL; }
+        !ManagedRSLConfigParam()
+        {
+            if (m_configParam != NULL)
+                delete m_configParam;
+            m_configParam = NULL;
+        }
+        ~ManagedRSLConfigParam()
+        {
+            if (m_configParam != NULL)
+                delete m_configParam;
+            m_configParam = NULL;
+        }
 
         property long long NewLeaderGracePeriodSec {
             long long get() { return m_configParam->m_newLeaderGracePeriodSec; }
@@ -338,11 +348,11 @@ namespace ManagedRSLib
             m_consecutiveFailures = replica->m_consecutiveFailures;
             m_lastVotePayload = replica->m_lastVotePayload;
 
-            if (replica->m_consecutiveFailures == 0) 
-            { 
+            if (replica->m_consecutiveFailures == 0)
+            {
                 m_failedAt = System::DateTime::MinValue;
             }
-            else 
+            else
             {
                 m_failedAt = ConvertSystemTimeToDateTime(replica->m_failedAt);
             }
@@ -378,8 +388,8 @@ namespace ManagedRSLib
         /*
          * The member Id this object describes the health for
          */
-        property String^ MemberId 
-        { 
+        property String^ MemberId
+        {
             String^ get() { return m_memberId; };
             void set(String^ value) { m_memberId = value; }
         }
@@ -387,8 +397,8 @@ namespace ManagedRSLib
         /*
          * Does RSL consider this replica "connected" to the quorum?
          */
-        property bool IsConnected 
-        { 
+        property bool IsConnected
+        {
             bool get() { return m_isConnected;}
             void set(bool value) { m_isConnected = value;}
         }
@@ -397,7 +407,7 @@ namespace ManagedRSLib
          * Does this instance of RSL consider this replica as Primary?
          */
         property bool IsPrimary
-        { 
+        {
             bool get() { return m_isPrimary;}
             void set(bool value) { m_isPrimary = value;}
         }
@@ -405,8 +415,8 @@ namespace ManagedRSLib
         /*
          * Number of outstanding messages to that replica
          */
-        property long NumOutstanding 
-        { 
+        property long NumOutstanding
+        {
             long get() { return m_numOutstanding;}
             void set(long value) { m_numOutstanding=value;}
         }
@@ -414,7 +424,7 @@ namespace ManagedRSLib
         /*
          * Last time the primary decided this replica was failed
          */
-        property System::DateTime FailedAt 
+        property System::DateTime FailedAt
         {
             System::DateTime get() { return m_failedAt; }
             void set(System::DateTime value) { m_failedAt = value; }
@@ -423,8 +433,8 @@ namespace ManagedRSLib
         /*
          * Number of consecutive failures on talking to this replica
          */
-        property long ConsecutiveFailures 
-        { 
+        property long ConsecutiveFailures
+        {
             long get() { return m_consecutiveFailures;}
             void set(long value) { m_consecutiveFailures = value; }
         }
@@ -432,8 +442,8 @@ namespace ManagedRSLib
         /*
          * Last time the primary successfully sent a decree to this replica
          */
-        property System::DateTime LastRequestSentAt 
-        { 
+        property System::DateTime LastRequestSentAt
+        {
             System::DateTime get() { return m_lastRequestSentAt;}
             void set(System::DateTime value) { m_lastRequestSentAt = value; }
         }
@@ -441,13 +451,13 @@ namespace ManagedRSLib
         /*
          * Last time the primary received a vote from this replica
          */
-        property System::DateTime LastRequestVotedAt 
-        { 
+        property System::DateTime LastRequestVotedAt
+        {
             System::DateTime get() { return m_lastRequestVotedAt;}
             void set(System::DateTime value) { m_lastRequestVotedAt = value; }
         }
 
-        /* 
+        /*
          * Last payload sent by this replica in a vote
          */
         property unsigned long long LastVotePayload
@@ -457,11 +467,11 @@ namespace ManagedRSLib
         }
 
         /*
-         * True if the primary is trying to reconnect to this replica. 
+         * True if the primary is trying to reconnect to this replica.
          * False if the primary considers the replica connected, or gave up completely.
          */
-        property bool NeedsResolve 
-        { 
+        property bool NeedsResolve
+        {
             bool get() { return m_needsResolve; }
             void set(bool value) { m_needsResolve = value; }
         }
@@ -483,7 +493,7 @@ namespace ManagedRSLib
         ~ManagedRSLNode() { delete m_node; m_node = NULL; }
 
         property String^ MemberId {
-            String^ get(); 
+            String^ get();
             void set(String^ value);
         }
 
@@ -492,12 +502,12 @@ namespace ManagedRSLib
                 return gcnew String(m_node->m_hostName);
             }
             void set(String^ value) {
-                
+
                 if (value == nullptr)
                 {
                     throw gcnew System::ArgumentNullException("value");
                 }
-                
+
                 IntPtr pStr = Marshal::StringToHGlobalAnsi(value);
                 if (FAILED(StringCbCopyA(
                         m_node->m_hostName,
@@ -512,8 +522,8 @@ namespace ManagedRSLib
 
         property IPAddress^ Ip {
             IPAddress^ get() { return gcnew IPAddress(m_node->m_ip); }
-            void set(IPAddress^ value) 
-            { 
+            void set(IPAddress^ value)
+            {
                 if (value->AddressFamily != AddressFamily::InterNetwork)
                 {
                     throw gcnew System::ArgumentException("Invalid IP family. Only IP V4 family is supported");
@@ -542,16 +552,16 @@ namespace ManagedRSLib
 
     public:
         ManagedRSLMemberSet() { m_rslMemberSet = new RSLMemberSet(); }
-        
+
         ManagedRSLMemberSet(
             array<ManagedRSLNode^>^ gc_members,
             array<System::Byte>^ gc_cookie,
             int offset,
             int length);
-        
+
         !ManagedRSLMemberSet() { delete m_rslMemberSet; m_rslMemberSet = NULL; }
         ~ManagedRSLMemberSet() { delete m_rslMemberSet; m_rslMemberSet = NULL; }
-        
+
         property array<ManagedRSLNode^>^ MemberArray { array<ManagedRSLNode^>^ get(); }
         property array<System::Byte>^ ConfigurationCookie { array<System::Byte>^ get(); }
 
@@ -568,27 +578,27 @@ namespace ManagedRSLib
     {
     public:
         static void SaveCheckpoint(
-            String^ directoryName, 
+            String^ directoryName,
             ManagedRSLProtocolVersion version,
-            unsigned long long lastExecutedSequenceNumber, 
+            unsigned long long lastExecutedSequenceNumber,
             unsigned int configurationNumber,
-            ManagedRSLMemberSet^ gc_memberSet, 
+            ManagedRSLMemberSet^ gc_memberSet,
             IManagedRSLCheckpointCreator^ gc_checkpointCreator);
 
         static bool ChangeReplicaSet(
-            String^ checkpointName, 
+            String^ checkpointName,
             ManagedRSLMemberSet^ memberSet);
 
         static bool MigrateToVersion3(
-            String^ checkpointName, 
+            String^ checkpointName,
             ManagedRSLMemberSet^ memberSet);
 
         static bool MigrateToVersion4(
-            String^ checkpointName, 
+            String^ checkpointName,
             ManagedRSLMemberSet^ memberSet);
 
         static bool GetReplicaSet(
-            String^ checkpointName, 
+            String^ checkpointName,
             ManagedRSLMemberSet^ memberSet);
 
         static String^ GetLatestCheckpoint(String^ rslDirectory);
@@ -598,7 +608,7 @@ namespace ManagedRSLib
         ManagedRSLCheckpointUtility();
     };
 
-    public enum class NotificationLevel 
+    public enum class NotificationLevel
     {
         Debug = RSLibImpl::LogLevel_Debug,
         Info = RSLibImpl::LogLevel_Info,
@@ -651,7 +661,7 @@ namespace ManagedRSLib
 
         RSLResponse CreateRequest(
             System::UInt64 maxSeenSeqNo,
-            array<System::Byte>^ gc_request, 
+            array<System::Byte>^ gc_request,
             int offset,
             int count,
             System::Object^ gc_cookie,
@@ -663,11 +673,11 @@ namespace ManagedRSLib
 
         void UnmarshalExecuteRequest(
             bool isFastRead,
-            void* request, 
+            void* request,
             unsigned int len,
             void* cookie,
             bool* saveState);
-        
+
         void UnmarshalAbortRequest(
             RSLResponseCode status,
             void* cookie);
@@ -686,12 +696,12 @@ namespace ManagedRSLib
             unsigned int len);
 
         void UnmarshalStateSaved(
-            unsigned long long seqNo, 
+            unsigned long long seqNo,
             const char* fileName);
 
         void UnmarshalStateCopied(
-            unsigned long long seqNo, 
-            const char* fileName, 
+            unsigned long long seqNo,
+            const char* fileName,
             void *cookie);
 
         delegate void NotificationsCallbackWrapper(int level, int logId, const char* title,const char*message);
@@ -726,7 +736,7 @@ namespace ManagedRSLib
             System::Object^ gc_cookie) = 0;
 
         virtual void SaveState(ManagedRSLCheckpointStream^ gc_writer) = 0;
-        
+
         virtual bool TrySaveState(ManagedRSLCheckpointStream^ gc_writer)
         {
             SaveState(gc_writer);
@@ -753,26 +763,26 @@ namespace ManagedRSLib
          * request.
          */
         virtual bool AcceptMessageFromReplica(ManagedRSLNode^ node, array<System::Byte>^ data) = 0;
-        
+
         virtual void ShutDown(RSLResponse status) = 0;
 
         virtual void AttemptPromotion();
         virtual void RelinquishPrimaryStatus();
 
         virtual void StateSaved(
-            System::UInt64 seqNo, 
+            System::UInt64 seqNo,
             System::String^ fileName) = 0;
 
         virtual void StateCopied(
-            System::UInt64 seqNo, 
-            System::String^ fileName, 
+            System::UInt64 seqNo,
+            System::String^ fileName,
             System::Object ^ gc_cookie) = 0;
 
         ManagedRSLStateMachine();
 
         !ManagedRSLStateMachine();
         ~ManagedRSLStateMachine();
-        
+
         bool Initialize(
             ManagedRSLConfigParam^ cfg,
             array<ManagedRSLNode^>^ nodes,
@@ -798,14 +808,14 @@ namespace ManagedRSLib
         bool Replay(
             System::String^ directory,
             System::UInt64 maxSeqNo);
-            
+
         RSLResponse ReplicateRequest(
             array<System::Byte>^ gc_request,
             System::Object^ gc_cookie);
 
         RSLResponse ReplicateRequest(
             array<System::Byte>^ gc_request,
-            System::Object^ gc_cookie, 
+            System::Object^ gc_cookie,
             bool isLastRequest);
 
         RSLResponse ReplicateRequest(
@@ -813,21 +823,21 @@ namespace ManagedRSLib
             int offset,
             int count,
             System::Object^ gc_cookie);
-                    
+
         RSLResponse FastReadRequest(
-            System::UInt64 maxSeenSeqNo, 
+            System::UInt64 maxSeenSeqNo,
             array<System::Byte>^ gc_request,
             int offset,
             int count,
             System::Object^ gc_cookie);
 
         RSLResponse FastReadRequest(
-            System::UInt64 maxSeenSeqNo, 
+            System::UInt64 maxSeenSeqNo,
             array<System::Byte>^ gc_request,
             System::Object^ gc_cookie);
 
         RSLResponse FastReadRequest(
-            System::UInt64 maxSeenSeqNo, 
+            System::UInt64 maxSeenSeqNo,
             array<System::Byte>^ gc_request,
             int offset,
             int count,
@@ -885,7 +895,7 @@ namespace ManagedRSLib
 
         static NotificationsCallbackDelegate^ s_notificationscallback = nullptr;
     };
-    
+
     //
     class RSLStateMachineWrapper : public RSLStateMachine
     {
@@ -900,7 +910,7 @@ namespace ManagedRSLib
             size_t len,
             void* cookie,
             bool *saveState);
-        
+
         void ExecuteFastReadRequest(
             void* request,
             size_t len,
@@ -924,7 +934,7 @@ namespace ManagedRSLib
         bool CanBecomePrimary(RSLPrimaryCookie *cookie);
 
         bool AcceptMessageFromReplica(RSLNode *node, void * data, unsigned int len);
-    
+
         void ShutDown(RSLResponseCode status);
 
         void StateSaved(unsigned long long seqNo, const char* fileName);
@@ -932,7 +942,7 @@ namespace ManagedRSLib
         void StateCopied(unsigned long long seqNo, const char* fileName, void *cookie);
 
         public:
-        
+
         RSLStateMachineWrapper(ManagedRSLStateMachine^ oManagedSM) : m_pManagedSM(oManagedSM) {};
 
         ~RSLStateMachineWrapper();
