@@ -727,10 +727,14 @@ RSLStateMachine::Bootstrap(RSLMemberSet* members, UInt32 timeout)
 void
 RSLStateMachine::Unload()
 {
-    for (RSLStateMachineIter i = sm_rslStateMachines.begin(); i != sm_rslStateMachines.end(); i++)
+    for (int i = 0; i < sm_rslStateMachines.size(); i++)
     {
-        RSLStateMachine *sm = *i;
-        sm->UnloadThisOne();
+        RSLStateMachine *sm = static_cast<RSLStateMachine*>(
+            InterlockedExchangePointer((PVOID *)&sm_rslStateMachines[i], nullptr));
+        if (sm != nullptr)
+        {
+            sm->UnloadThisOne();
+        }
     }
 
     sm_rslStateMachines.clear();
