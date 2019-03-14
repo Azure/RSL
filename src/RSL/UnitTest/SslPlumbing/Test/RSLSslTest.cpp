@@ -612,6 +612,4 @@ int main(int argc, char* argv[])
         PrintUsage();
         return 1;
     }
-
-    return 0;
 }

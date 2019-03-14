@@ -1218,7 +1218,7 @@ TestEngine::HandleFetchRequest(void * /*arg*/)
                         Message_FetchCheckpoint == msg->m_msgId ||
                         Message_StatusQuery == msg->m_msgId);
 
-        FetchRequest *req = new FetchRequest(pSock.get(), msg);
+        FetchRequest *req = new FetchRequest(pSock.release(), msg);
         {
             AutoCriticalSection lock(&m_lock);
             m_fetchRecvQ.enqueue(req);
